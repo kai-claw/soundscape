@@ -12,18 +12,38 @@ import { TouchHandler } from './components/TouchHandler';
 import { A11yAnnouncer } from './components/A11yAnnouncer';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { CinematicBadge } from './components/CinematicBadge';
+import { BpmDisplay } from './components/BpmDisplay';
+import { FpsCounter } from './components/FpsCounter';
 import { Starfield } from './visualizers/Starfield';
 import { useStore } from './store/useStore';
 import { themeMap } from './themes/colorThemes';
 import { audioEngine, AudioEngine } from './audio/AudioEngine';
+import { parseUrlConfig } from './utils/urlState';
 
 function App() {
   const theme = useStore((s) => s.theme);
+  const showFps = useStore((s) => s.showFps);
   const colors = themeMap[theme];
   const [started, setStarted] = useState(false);
   const [webglLost, setWebglLost] = useState(false);
   const [fileError, setFileError] = useState('');
   const contextListenersRef = useRef<{ lost: EventListener; restored: EventListener } | null>(null);
+
+  // Apply URL config on mount (e.g., shared link)
+  useEffect(() => {
+    const urlConfig = parseUrlConfig();
+    if (urlConfig) {
+      const store = useStore.getState();
+      if (urlConfig.mode) store.setMode(urlConfig.mode);
+      if (urlConfig.theme) store.setTheme(urlConfig.theme);
+      if (urlConfig.sensitivity !== undefined) store.setSensitivity(urlConfig.sensitivity);
+      if (urlConfig.cinematic !== undefined && urlConfig.cinematic !== store.cinematic) store.toggleCinematic();
+      if (urlConfig.starfield !== undefined && urlConfig.starfield !== store.starfield) store.toggleStarfield();
+      if (urlConfig.orbitRing !== undefined && urlConfig.orbitRing !== store.orbitRing) store.toggleOrbitRing();
+      if (urlConfig.beatPulse !== undefined && urlConfig.beatPulse !== store.beatPulse) store.toggleBeatPulse();
+      if (urlConfig.shockwave !== undefined && urlConfig.shockwave !== store.shockwave) store.toggleShockwave();
+    }
+  }, []);
 
   const [unsupported] = useState(() => {
     const support = AudioEngine.checkSupport();
@@ -156,7 +176,7 @@ function App() {
           camera={{ position: [0, 2, 7], fov: 60 }}
           dpr={[1, 2]}
           style={{ position: 'absolute', inset: 0 }}
-          gl={{ antialias: true, alpha: true }}
+          gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }}
           aria-hidden="true"
           onCreated={({ gl }) => {
             // Handle WebGL context loss gracefully
@@ -182,6 +202,8 @@ function App() {
         </Canvas>
         {!prefersReducedMotion && <BeatFlash />}
         <CinematicBadge />
+        <BpmDisplay />
+        <FpsCounter visible={showFps} />
         <ControlPanel />
         <AudioTransport />
         <FullscreenBtn />

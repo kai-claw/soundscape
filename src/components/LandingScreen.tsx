@@ -105,6 +105,8 @@ export function LandingScreen({ onStart }: { onStart: () => void }) {
           <span>✨ Particles</span>
           <span>🔮 Kaleidoscope</span>
           <span>🕳️ Tunnel</span>
+          <span>🏔️ Waterfall</span>
+          <span>🔥 Flame</span>
         </div>
       </div>
     </div>

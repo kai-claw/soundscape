@@ -4,10 +4,10 @@ import type { ColorTheme } from '../store/useStore';
 
 describe('colorThemes', () => {
   describe('themeMap', () => {
-    const themes: ColorTheme[] = ['neon', 'sunset', 'ocean', 'monochrome'];
+    const themes: ColorTheme[] = ['neon', 'sunset', 'ocean', 'monochrome', 'arctic', 'forest'];
 
-    it('defines all 4 themes', () => {
-      expect(Object.keys(themeMap)).toHaveLength(4);
+    it('defines all 6 themes', () => {
+      expect(Object.keys(themeMap)).toHaveLength(6);
       for (const t of themes) {
         expect(themeMap[t]).toBeDefined();
       }

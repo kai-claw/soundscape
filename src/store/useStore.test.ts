@@ -74,7 +74,7 @@ describe('useStore', () => {
 
   describe('theme management', () => {
     it('cycles through themes in order', () => {
-      const expected = ['sunset', 'ocean', 'monochrome', 'neon'];
+      const expected = ['sunset', 'ocean', 'monochrome', 'arctic', 'forest', 'neon'];
       for (const theme of expected) {
         useStore.getState().cycleTheme();
         expect(useStore.getState().theme).toBe(theme);
@@ -82,8 +82,8 @@ describe('useStore', () => {
     });
 
     it('wraps around after last theme', () => {
-      // Cycle through all 4 themes
-      for (let i = 0; i < 4; i++) useStore.getState().cycleTheme();
+      // Cycle through all 6 themes
+      for (let i = 0; i < 6; i++) useStore.getState().cycleTheme();
       expect(useStore.getState().theme).toBe('neon');
     });
 
@@ -93,7 +93,7 @@ describe('useStore', () => {
     });
 
     it('handles all color themes', () => {
-      const themes = ['neon', 'sunset', 'ocean', 'monochrome'] as const;
+      const themes = ['neon', 'sunset', 'ocean', 'monochrome', 'arctic', 'forest'] as const;
       for (const t of themes) {
         useStore.getState().setTheme(t);
         expect(useStore.getState().theme).toBe(t);

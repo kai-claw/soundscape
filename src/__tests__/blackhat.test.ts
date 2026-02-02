@@ -298,7 +298,7 @@ describe('Black Hat: Performance', () => {
     expect(store).toContain('audioLevel, bassLevel, midLevel, highLevel');
     // Scene should use batch setter
     const scene = readSrc('visualizers/VisualizerScene.tsx');
-    expect(scene).toContain('setAudioLevels(level, bands.bass, bands.mid, bands.high)');
+    expect(scene).toContain('setAudioLevels(gainedLevel, gainedBass, gainedMid, gainedHigh)');
   });
 
   it('WaveformRibbon should dispose geometry/material on unmount', () => {
@@ -363,7 +363,7 @@ describe('Black Hat: Help Overlay', () => {
 
   it('should list all keyboard shortcuts', () => {
     const help = readSrc('components/HelpOverlay.tsx');
-    expect(help).toContain('1-5');
+    expect(help).toContain('1-7');
     expect(help).toContain('Space');
     expect(help).toContain('Esc');
     expect(help).toContain('H / ?');

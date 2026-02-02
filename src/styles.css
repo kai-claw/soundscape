@@ -1130,6 +1130,293 @@ input[type='range']:focus-visible {
   margin-left: 2px;
 }
 
+/* ===== Panel Header Actions ===== */
+.panel-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.panel-header-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.icon-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.85rem;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+/* ===== Collapsed Panel ===== */
+.control-panel-collapsed {
+  width: auto;
+  padding: 12px 16px;
+  animation: slideIn 0.3s ease;
+}
+
+.collapsed-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.collapsed-bar h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.collapsed-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 80px;
+}
+
+.level-meter-sm {
+  width: 60px;
+}
+
+.panel-toggle-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.7rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.panel-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* ===== Preset Grid ===== */
+.preset-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+
+.preset-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.preset-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+.preset-btn:active {
+  transform: scale(0.95);
+}
+
+.preset-btn.active {
+  color: #fff;
+  border-width: 1.5px;
+}
+
+.preset-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.preset-name {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ===== Shockwave Active ===== */
+.experience-btn.shockwave-active {
+  background: rgba(255, 180, 50, 0.2);
+  border-color: rgba(255, 180, 50, 0.5);
+  color: #ffb432;
+}
+
+/* ===== OrbitRing Active ===== */
+.experience-btn.orbitring-active {
+  background: rgba(100, 200, 255, 0.15);
+  border-color: rgba(100, 200, 255, 0.4);
+  color: #64c8ff;
+}
+
+/* ===== BeatPulse Active ===== */
+.experience-btn.beatpulse-active {
+  background: rgba(255, 80, 120, 0.15);
+  border-color: rgba(255, 80, 120, 0.4);
+  color: #ff5078;
+}
+
+/* ===== BPM Display ===== */
+.bpm-display {
+  position: absolute;
+  bottom: 80px;
+  left: 16px;
+  z-index: 10;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.5s ease;
+}
+
+.bpm-ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid;
+  border-radius: 50%;
+  opacity: 0.5;
+  transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+  pointer-events: none;
+}
+
+.bpm-orbit {
+  position: absolute;
+  inset: -4px;
+  animation: bpmOrbit 500ms linear infinite;
+}
+
+@keyframes bpmOrbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.bpm-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 6px currentColor;
+}
+
+.bpm-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 10px currentColor;
+}
+
+.bpm-label {
+  font-size: 0.55rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 1px;
+}
+
+/* ===== FPS Counter ===== */
+.fps-counter {
+  position: absolute;
+  top: 16px;
+  left: 60px;
+  z-index: 10;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(10, 10, 20, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  animation: fadeIn 0.3s ease;
+}
+
+.fps-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s ease;
+}
+
+.fps-label {
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ===== Mini Spectrum ===== */
+.mini-spectrum {
+  margin: -4px 0;
+}
+
+/* ===== Auto-Gain Button ===== */
+.sensitivity-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.auto-gain-btn {
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.auto-gain-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.auto-gain-btn.active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ===== Share Button ===== */
+.share-btn {
+  position: relative;
+}
+
 /* ===== Very Small Screens ===== */
 @media (max-width: 380px) {
   .landing-title {

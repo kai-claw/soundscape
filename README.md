@@ -1,96 +1,157 @@
 # 🎵 SoundScape — Audio-Reactive 3D Visualizer
 
-An immersive, real-time 3D audio visualizer built with React, Three.js, and the Web Audio API. Connect your microphone or upload any audio file to watch sound come alive.
+A real-time audio-reactive 3D visualizer built with React, Three.js, and the Web Audio API. Feed it your microphone or an audio file and watch sound come alive in 7 distinct visualization modes with 6 color themes.
 
-**[▶ Live Demo](https://kai-claw.github.io/soundscape/)**
+**[🔗 Live Demo](https://kai-claw.github.io/soundscape/)**
 
-![SoundScape](https://img.shields.io/badge/React_19-Three.js-ff00ff?style=flat-square)
-![Status](https://img.shields.io/badge/Status-Live-00ffff?style=flat-square)
+![SoundScape](public/og-image.svg)
 
-## Features
+## ✨ Features
 
-### 🎨 Five Visualization Modes
-- **🌊 Waveform Ribbon** — Custom GLSL shader ribbon that dances with the audio waveform
-- **📊 Frequency Bars** — 16×16 instanced 3D bar grid mapped to frequency spectrum
-- **✨ Particle Field** — 3,000 additive-blended particles with custom shader, responsive to all frequency bands
-- **🔮 Kaleidoscope** — 8-fold mirrored 3D geometry (octahedra, tetrahedra, icosahedra, torus, cones, dodecahedra)
-- **🕳️ Tunnel** — 30 depth-scrolling torus rings with bass-reactive pulse
+### 7 Visualization Modes
 
-### 🎵 Audio Engine
-- **Microphone input** — Real-time visualization of live audio
-- **File upload** — MP3, WAV, OGG, FLAC with full transport controls (seek, time display)
-- **FFT analysis** — 2048-sample FFT with frequency, time-domain, and band separation (bass/mid/high)
-- **BPM detection** — Onset-based beat detection with dynamic thresholding
+| # | Mode | Description |
+|---|------|-------------|
+| 1 | 🌊 **Waveform Ribbon** | Custom GLSL vertex+fragment shader, 128-segment flowing ribbon |
+| 2 | 📊 **Frequency Bars** | 16×16 InstancedMesh grid (256 bars), height + color mapped to FFT |
+| 3 | ✨ **Particle Field** | 3,000 particles with custom shader, additive blending |
+| 4 | 🔮 **Kaleidoscope** | 8-fold mirrored geometry, 6 shape types (48 meshes) |
+| 5 | 🕳️ **Tunnel** | 30 wireframe torus rings, depth-scrolling, bass-reactive pulse |
+| 6 | 🏔️ **Waterfall** | 3D scrolling spectrogram terrain — sound history as landscape |
+| 7 | 🔥 **Flame** | Procedural GLSL aurora fire with simplex noise + FBM |
 
-### ✨ Visual Effects
-- **Bloom** — Dynamic post-processing bloom that pulses with bass energy
-- **Chromatic aberration** — Bass-reactive color fringing
-- **Vignette** — Cinematic edge darkening
-- **Beat flash** — Full-screen radial pulse on detected beats
-- **Smooth transitions** — Crossfade between visualization modes
+### 6 Color Themes
+- 💜 **Neon** — Magenta / Cyan / Yellow
+- 🌅 **Sunset** — Orange / Red / Gold
+- 🌊 **Ocean** — Blue / Teal / Sky
+- ⚪ **Monochrome** — Clean black & white
+- ❄️ **Arctic** — Icy blues / whites / frost
+- 🌲 **Forest** — Deep emerald / lime / earth
 
-### 🎨 Color Themes
-- **💜 Neon** — Magenta / Cyan / Yellow
-- **🌅 Sunset** — Orange / Red / Gold
-- **🌊 Ocean** — Blue / Teal / Sky
-- **⚪ Monochrome** — Grayscale elegance
+### Audio Engine
+- **Web Audio API** with 2048-point FFT analysis
+- **Microphone input** (real-time) or **file upload** (MP3, WAV, FLAC, OGG, etc.)
+- **BPM detection** via onset analysis with dynamic thresholding
+- **Auto-gain normalization** — quiet tracks feel as punchy as loud ones
+- **Smooth audio processing** — 8-band spectral analysis with asymmetric attack/release
+- **Band separation** — bass, mid, high frequency isolation
 
-### ⌨️ Keyboard Shortcuts
+### Experience Layers (stackable effects)
+- 🎬 **Cinematic** — Auto-cycles through all 7 modes with smooth transitions
+- ✦ **Starfield** — 800 audio-reactive stars with bass drift + high-freq twinkle
+- ◎ **Orbit Ring** — Circular frequency mandala, dual-ring with spectrum color mapping
+- 💓 **Beat Pulse** — FOV camera pump synced to bass hits (impulse-decay model)
+- 💥 **Shockwave** — Expanding torus rings triggered by strong bass onsets
+
+### 8 Curated Presets
+One-click combos that showcase the best feature combinations:
+- 🧘 **Zen** — Calm ocean waves + gentle starfield
+- 🎉 **Rave** — Full neon chaos, everything cranked up
+- 🌌 **Ambient** — Dreamy particles + orbit ring
+- 🔥 **Inferno** — Blazing flame + beat shockwaves
+- 🎬 **Cinema** — Auto-cycling modes + full effects
+- ◻️ **Minimal** — Clean monochrome frequency bars
+- ❄️ **Frozen** — Icy particles + arctic starfield
+- 🌿 **Jungle** — Deep forest tunnel + beat pulse
+
+### Sharing & Screenshots
+- **URL state encoding** — share your exact configuration via URL hash
+- **Native share dialog** on mobile, clipboard fallback on desktop
+- **Screenshot capture** — download PNG snapshots of the visualization
+- **URL auto-sync** — URL updates as you change settings
+
+### Accessibility
+- Full **ARIA** attributes on all controls
+- **Skip links** for keyboard navigation
+- **Reduced motion** support (`prefers-reduced-motion`)
+- **Screen reader** announcements for mode/theme changes
+- **Focus management** with visible outlines
+- **Tab order** for all interactive elements
+
+### UI / UX
+- **Collapsible control panel** (P key) for immersive viewing
+- **Mini spectrum analyzer** in control panel
+- **FPS counter** toggle
+- **Help overlay** (H key) with all keyboard shortcuts
+- **Touch support** with swipe gesture handling
+- **WebGL context loss** recovery with user notification
+- **File error handling** with auto-dismissing notifications
+- **Audio context resume** on tab visibility change
+
+## ⌨️ Keyboard Shortcuts
+
 | Key | Action |
 |-----|--------|
-| `1-5` | Switch visualization mode |
-| `T` | Cycle color themes |
-| `Space` | Pause / Resume |
+| 1-7 | Switch visualization mode |
+| ← → | Cycle modes |
+| T | Cycle theme |
+| Space | Play / Pause |
+| C | Toggle cinematic autoplay |
+| S | Toggle starfield |
+| O | Toggle orbit ring |
+| B | Toggle beat pulse |
+| W | Toggle shockwave |
+| P | Collapse / expand panel |
+| G | Toggle auto-gain |
+| F | Toggle fullscreen |
+| H | Show help overlay |
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-- **React 19** + TypeScript
-- **Three.js** via `@react-three/fiber` + `@react-three/drei`
-- **Post-processing** via `@react-three/postprocessing` (Bloom, ChromaticAberration, Vignette)
-- **Custom GLSL shaders** (waveform ribbon, particle field)
-- **Web Audio API** (AnalyserNode, FFT, MediaStream, MediaElement)
-- **Zustand** for state management
-- **Vite** for build tooling
+- **React 19** + **TypeScript**
+- **Three.js** / **React Three Fiber** / **drei**
+- **Web Audio API** (AnalyserNode, MediaStream, MediaElement)
+- **Custom GLSL shaders** (vertex + fragment for Waveform, Particles, Flame, Starfield, Waterfall)
+- **Zustand** state management
+- **Vite** build tooling
+- **Vitest** testing (303 tests)
 
-## Architecture
+## 📊 Build Stats
+
+| Metric | Value |
+|--------|-------|
+| Total Files | 48 (38 source + 10 test/setup) |
+| Total LOC | 8,434 (4,677 source + 2,874 test + 883 CSS) |
+| TypeScript Errors | 0 |
+| Test Count | 303 (8 test suites) |
+| Bundle (JS) | 72KB app + 494KB R3F + 719KB Three.js |
+| Gzip (JS) | 23KB + 152KB + 187KB = ~362KB |
+| CSS | 19.4KB (4.3KB gzip) |
+
+## 🚀 Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Dev server
+npm run dev
+
+# Build for production
+npm run build
+
+# Run tests
+npm test
+
+# Type check
+npx tsc --noEmit
+```
+
+## 📁 Project Structure
 
 ```
 src/
-├── audio/
-│   ├── AudioEngine.ts      # Web Audio API wrapper (mic/file, FFT, bands)
-│   └── BPMDetector.ts       # Onset-based BPM detection
-├── components/
-│   ├── LandingScreen.tsx     # Entry screen with audio source selection
-│   ├── ControlPanel.tsx      # Mode/theme/sensitivity controls
-│   ├── AudioTransport.tsx    # File playback seek bar
-│   ├── BeatFlash.tsx         # Bass-reactive screen flash
-│   ├── FullscreenBtn.tsx     # Fullscreen toggle
-│   └── KeyboardHandler.tsx   # Keyboard shortcuts
-├── visualizers/
-│   ├── VisualizerScene.tsx   # Scene orchestrator + audio update loop
-│   ├── WaveformRibbon.tsx    # GLSL waveform ribbon
-│   ├── FrequencyBars.tsx     # Instanced 3D frequency bars
-│   ├── ParticleField.tsx     # 3K particle shader system
-│   ├── Kaleidoscope.tsx      # Mirrored geometry kaleidoscope
-│   ├── Tunnel.tsx            # Depth-scrolling ring tunnel
-│   └── PostProcessing.tsx    # Bloom + chromatic aberration + vignette
-├── themes/
-│   └── colorThemes.ts        # 4 color palettes with RGB arrays
-├── store/
-│   └── useStore.ts           # Zustand state (mode, theme, audio levels, BPM)
-├── App.tsx                    # Root component
-├── main.tsx                   # Entry point
-└── styles.css                 # Full responsive CSS
+├── audio/           # Audio engine, BPM detection, smooth processing, auto-gain
+├── components/      # UI: control panel, landing screen, transport, overlays
+├── visualizers/     # 7 Three.js visualization modes + scene orchestrator
+├── themes/          # 6 color theme definitions
+├── store/           # Zustand state management + experience presets
+├── utils/           # URL state encoding/decoding
+├── __tests__/       # Pass-based test suites (white/black/green/yellow hat)
+├── App.tsx          # Root component
+└── main.tsx         # Entry point
 ```
 
-## Development
-
-```bash
-npm install
-npm run dev      # http://localhost:5173
-npm run build    # Production build
-```
-
-## License
+## 📝 License
 
 MIT

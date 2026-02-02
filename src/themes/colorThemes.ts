@@ -62,6 +62,32 @@ export const themeMap: Record<ColorTheme, ThemeColors> = {
       [0.87, 0.87, 0.87],
     ],
   },
+  arctic: {
+    primary: '#88ccff',
+    secondary: '#44aaee',
+    tertiary: '#ffffff',
+    accent: '#aaeeff',
+    background: '#040810',
+    colors: [
+      [0.53, 0.8, 1.0],
+      [0.27, 0.67, 0.93],
+      [1.0, 1.0, 1.0],
+      [0.67, 0.93, 1.0],
+    ],
+  },
+  forest: {
+    primary: '#22cc66',
+    secondary: '#66ff99',
+    tertiary: '#88ddaa',
+    accent: '#33ff88',
+    background: '#040d08',
+    colors: [
+      [0.13, 0.8, 0.4],
+      [0.4, 1.0, 0.6],
+      [0.53, 0.87, 0.67],
+      [0.2, 1.0, 0.53],
+    ],
+  },
 };
 
 export function getThemeColor(theme: ColorTheme, index: number): [number, number, number] {

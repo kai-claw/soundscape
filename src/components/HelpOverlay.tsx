@@ -1,12 +1,18 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 const shortcuts: { key: string; action: string }[] = [
-  { key: '1-5', action: 'Switch visualization mode' },
+  { key: '1-7', action: 'Switch visualization mode' },
   { key: 'T', action: 'Cycle color theme' },
   { key: 'C', action: 'Toggle cinematic autoplay' },
   { key: 'S', action: 'Toggle starfield background' },
+  { key: 'O', action: 'Toggle orbit ring overlay' },
+  { key: 'B', action: 'Toggle beat camera pulse' },
+  { key: 'W', action: 'Toggle beat shockwave' },
+  { key: 'P', action: 'Toggle panel collapse' },
   { key: 'Space', action: 'Pause / Resume audio' },
+  { key: 'G', action: 'Toggle auto-gain normalization' },
   { key: 'F', action: 'Toggle fullscreen' },
+  { key: 'Shift+F', action: 'Toggle FPS counter' },
   { key: 'H / ?', action: 'Toggle this help overlay' },
   { key: 'Esc', action: 'Close help overlay' },
   { key: '←/→', action: 'Previous/Next mode (swipe on mobile)' },

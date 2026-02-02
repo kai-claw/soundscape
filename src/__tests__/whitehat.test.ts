@@ -178,10 +178,10 @@ describe('BPMDetector', () => {
 // ─── Color Themes ───────────────────────────────────────────────────────────
 
 describe('Color Themes', () => {
-  const themeNames: ColorTheme[] = ['neon', 'sunset', 'ocean', 'monochrome'];
+  const themeNames: ColorTheme[] = ['neon', 'sunset', 'ocean', 'monochrome', 'arctic', 'forest'];
 
-  it('has exactly 4 themes', () => {
-    expect(Object.keys(themeMap)).toHaveLength(4);
+  it('has exactly 6 themes', () => {
+    expect(Object.keys(themeMap)).toHaveLength(6);
   });
 
   themeNames.forEach((name) => {
@@ -299,9 +299,9 @@ describe('Store Types Consistency', () => {
     });
   });
 
-  it('ColorTheme covers all 4 themes', () => {
-    const themes: ColorTheme[] = ['neon', 'sunset', 'ocean', 'monochrome'];
-    expect(themes).toHaveLength(4);
+  it('ColorTheme covers all 6 themes', () => {
+    const themes: ColorTheme[] = ['neon', 'sunset', 'ocean', 'monochrome', 'arctic', 'forest'];
+    expect(themes).toHaveLength(6);
     themes.forEach((t) => {
       expect(themeMap[t]).toBeDefined();
     });

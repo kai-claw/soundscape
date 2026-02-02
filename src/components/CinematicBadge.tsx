@@ -4,7 +4,7 @@ import { themeMap } from '../themes/colorThemes';
 
 const CINEMATIC_INTERVAL = 12000; // 12 seconds per mode
 
-const modes: VisualizationMode[] = ['waveform', 'frequency', 'particles', 'kaleidoscope', 'tunnel'];
+const modes: VisualizationMode[] = ['waveform', 'frequency', 'particles', 'kaleidoscope', 'tunnel', 'waterfall', 'flame'];
 
 const modeInfo: Record<VisualizationMode, { emoji: string; name: string; desc: string }> = {
   waveform: { emoji: '🌊', name: 'Waveform', desc: 'Audio ribbon flowing through space' },
@@ -12,6 +12,8 @@ const modeInfo: Record<VisualizationMode, { emoji: string; name: string; desc: s
   particles: { emoji: '✨', name: 'Particles', desc: '3000 audio-reactive particles' },
   kaleidoscope: { emoji: '🔮', name: 'Kaleidoscope', desc: '8-fold mirrored geometry' },
   tunnel: { emoji: '🕳️', name: 'Tunnel', desc: 'Bass-reactive warp tunnel' },
+  waterfall: { emoji: '🏔️', name: 'Waterfall', desc: 'Scrolling spectrum heatmap' },
+  flame: { emoji: '🔥', name: 'Flame', desc: 'Procedural GLSL aurora fire' },
 };
 
 export function CinematicBadge() {

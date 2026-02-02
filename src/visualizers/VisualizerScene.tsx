@@ -5,12 +5,19 @@ import { useStore } from '../store/useStore';
 import { audioEngine } from '../audio/AudioEngine';
 import { audioData } from '../audio/audioData';
 import { BPMDetector } from '../audio/BPMDetector';
+import { smoothAudio } from '../audio/SmoothAudio';
+import { autoGain } from '../audio/AutoGain';
 import { WaveformRibbon } from './WaveformRibbon';
 import { FrequencyBars } from './FrequencyBars';
 import { ParticleField } from './ParticleField';
 import { Kaleidoscope } from './Kaleidoscope';
 import { Tunnel } from './Tunnel';
+import { SpectrumWaterfall } from './SpectrumWaterfall';
+import { AudioFlame } from './AudioFlame';
+import { AudioOrbitRing } from './AudioOrbitRing';
 import { PostProcessing } from './PostProcessing';
+import { BeatCameraPulse } from '../components/BeatCameraPulse';
+import { BeatShockwave } from '../components/BeatShockwave';
 
 const bpmDetector = new BPMDetector();
 
@@ -31,14 +38,18 @@ export function VisualizerScene({ reducedMotion = false }: Props) {
   const setBpm = useStore((s) => s.setBpm);
   const setAudioLevels = useStore((s) => s.setAudioLevels);
   const setNoSignal = useStore((s) => s.setNoSignal);
+  const autoGainEnabled = useStore((s) => s.autoGain);
+  const sensitivity = useStore((s) => s.sensitivity);
 
   // Track frames without audio signal
   const silentFramesRef = useRef(0);
   const wasSignalRef = useRef(false);
 
-  // Reset BPM detector when audio source changes (old beat history is irrelevant)
+  // Reset BPM detector and smooth audio when audio source changes
   useEffect(() => {
     bpmDetector.reset();
+    smoothAudio.reset();
+    autoGain.reset();
     silentFramesRef.current = 0;
     wasSignalRef.current = false;
     setNoSignal(false);
@@ -60,8 +71,21 @@ export function VisualizerScene({ reducedMotion = false }: Props) {
 
     const level = audioEngine.getAverageLevel();
     const bands = audioEngine.getBandLevels();
+
+    // Auto-gain: normalize quiet/loud tracks to consistent levels
+    autoGain.setEnabled(autoGainEnabled);
+    const gain = autoGain.update(level);
+    const effectiveSensitivity = sensitivity * gain;
+
+    // Update smooth audio analysis (available to all visualizers)
+    smoothAudio.update(audioData.freq, effectiveSensitivity);
+
     // Single set() call per frame instead of 4 — reduces GC pressure and re-renders
-    setAudioLevels(level, bands.bass, bands.mid, bands.high);
+    const gainedLevel = Math.min(1, level * gain);
+    const gainedBass = Math.min(1, bands.bass * gain);
+    const gainedMid = Math.min(1, bands.mid * gain);
+    const gainedHigh = Math.min(1, bands.high * gain);
+    setAudioLevels(gainedLevel, gainedBass, gainedMid, gainedHigh);
 
     // No-signal detection: flag after ~3s of silence
     const hasSignal = audioEngine.isReceivingAudio();
@@ -131,7 +155,16 @@ export function VisualizerScene({ reducedMotion = false }: Props) {
       {(mode === 'tunnel' || prevMode === 'tunnel') && (
         <Tunnel opacity={getOpacity('tunnel')} />
       )}
+      {(mode === 'waterfall' || prevMode === 'waterfall') && (
+        <SpectrumWaterfall opacity={getOpacity('waterfall')} />
+      )}
+      {(mode === 'flame' || prevMode === 'flame') && (
+        <AudioFlame opacity={getOpacity('flame')} />
+      )}
 
+      <AudioOrbitRing />
+      <BeatCameraPulse />
+      <BeatShockwave />
       <PostProcessing reducedMotion={reducedMotion} />
     </>
   );
