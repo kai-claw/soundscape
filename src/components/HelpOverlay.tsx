@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 const shortcuts: { key: string; action: string }[] = [
   { key: '1-5', action: 'Switch visualization mode' },
   { key: 'T', action: 'Cycle color theme' },
+  { key: 'C', action: 'Toggle cinematic autoplay' },
+  { key: 'S', action: 'Toggle starfield background' },
   { key: 'Space', action: 'Pause / Resume audio' },
   { key: 'F', action: 'Toggle fullscreen' },
   { key: 'H / ?', action: 'Toggle this help overlay' },

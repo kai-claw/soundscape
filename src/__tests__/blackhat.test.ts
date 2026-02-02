@@ -13,8 +13,8 @@
  * - No-signal detection
  * - Browser compatibility checks
  */
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { readFileSync, readdirSync, existsSync } from 'fs';
+import { describe, it, expect } from 'vitest';
+import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
 const SRC = join(__dirname, '..');
@@ -255,7 +255,7 @@ describe('Black Hat: Performance', () => {
     expect(bars).toContain('colorAttrRef.current.needsUpdate = true');
     // The attribute should be created in useEffect (once), not per-frame
     // Extract useFrame body and ensure no InstancedBufferAttribute there
-    const useFrameMatch = bars.match(/useFrame\(\(\)\s*=>\s*\{([\s\S]*?)\n  \}\)/);
+    const useFrameMatch = bars.match(/useFrame\(\(\)\s*=>\s*\{([\s\S]*?)\n {2}\}\)/);
     if (useFrameMatch) {
       expect(useFrameMatch[1]).not.toContain('new THREE.InstancedBufferAttribute');
     }

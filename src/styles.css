@@ -1000,6 +1000,136 @@ input[type='range']:focus-visible {
   }
 }
 
+/* ===== Cinematic Badge ===== */
+.cinematic-badge {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: rgba(10, 0, 20, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  animation: cinematicSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  min-width: 220px;
+}
+
+@keyframes cinematicSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+.cinematic-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: cinematicPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes cinematicPulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 4px currentColor; }
+  50% { opacity: 0.5; box-shadow: 0 0 8px currentColor; }
+}
+
+.cinematic-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.cinematic-mode {
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.cinematic-desc {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.7rem;
+}
+
+.cinematic-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 12px;
+  right: 12px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.cinematic-progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 1px;
+  transition: none;
+}
+
+/* ===== Experience Grid ===== */
+.experience-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.experience-btn {
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  position: relative;
+}
+
+.experience-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.experience-btn:active {
+  transform: scale(0.96);
+}
+
+.experience-btn.cinematic-active {
+  background: rgba(255, 100, 50, 0.2);
+  border-color: rgba(255, 100, 50, 0.5);
+  color: #ff6432;
+}
+
+.experience-btn.starfield-active {
+  background: rgba(150, 180, 255, 0.15);
+  border-color: rgba(150, 180, 255, 0.4);
+  color: #aabbff;
+}
+
+.experience-btn .key-hint {
+  font-size: 0.6rem;
+  opacity: 0.4;
+  margin-left: 2px;
+}
+
 /* ===== Very Small Screens ===== */
 @media (max-width: 380px) {
   .landing-title {

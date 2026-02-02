@@ -34,6 +34,10 @@ export function ControlPanel() {
   const togglePlay = useStore((s) => s.togglePlay);
   const setFileName = useStore((s) => s.setFileName);
   const noSignal = useStore((s) => s.noSignal);
+  const cinematic = useStore((s) => s.cinematic);
+  const starfield = useStore((s) => s.starfield);
+  const toggleCinematic = useStore((s) => s.toggleCinematic);
+  const toggleStarfield = useStore((s) => s.toggleStarfield);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const themeColors = themeMap[theme];
@@ -173,11 +177,34 @@ export function ControlPanel() {
         </button>
       </div>
 
+      <div className="control-section">
+        <label>Experience</label>
+        <div className="experience-grid">
+          <button
+            className={`experience-btn${cinematic ? ' active cinematic-active' : ''}`}
+            onClick={toggleCinematic}
+            aria-pressed={cinematic}
+            aria-label="Toggle cinematic autoplay (key C)"
+          >
+            🎬 Cinematic <span className="key-hint" aria-hidden="true">C</span>
+          </button>
+          <button
+            className={`experience-btn${starfield ? ' active starfield-active' : ''}`}
+            onClick={toggleStarfield}
+            aria-pressed={starfield}
+            aria-label="Toggle starfield background (key S)"
+          >
+            ✦ Starfield <span className="key-hint" aria-hidden="true">S</span>
+          </button>
+        </div>
+      </div>
+
       <div className="shortcuts-hint" aria-hidden="true">
         <span>1-5: Modes</span>
         <span>T: Theme</span>
+        <span>C: Cinema</span>
+        <span>S: Stars</span>
         <span>H: Help</span>
-        <span>Space: Pause</span>
       </div>
     </div>
   );

@@ -20,6 +20,10 @@ interface AppState {
   fileName: string | null;
   /** True when audio source is connected but no signal is detected */
   noSignal: boolean;
+  /** Cinematic autoplay — auto-cycles through visualization modes */
+  cinematic: boolean;
+  /** Audio-reactive starfield background layer */
+  starfield: boolean;
 
   setMode: (mode: VisualizationMode) => void;
   cycleTheme: () => void;
@@ -37,6 +41,8 @@ interface AppState {
   setTransitionProgress: (val: number) => void;
   setFileName: (name: string | null) => void;
   setNoSignal: (noSignal: boolean) => void;
+  toggleCinematic: () => void;
+  toggleStarfield: () => void;
 }
 
 const themes: ColorTheme[] = ['neon', 'sunset', 'ocean', 'monochrome'];
@@ -56,6 +62,8 @@ export const useStore = create<AppState>((set, get) => ({
   highLevel: 0,
   fileName: null,
   noSignal: false,
+  cinematic: false,
+  starfield: true,
 
   setMode: (mode) => {
     const current = get().mode;
@@ -80,4 +88,6 @@ export const useStore = create<AppState>((set, get) => ({
   setTransitionProgress: (transitionProgress) => set({ transitionProgress }),
   setFileName: (fileName) => set({ fileName }),
   setNoSignal: (noSignal) => set({ noSignal }),
+  toggleCinematic: () => set((s) => ({ cinematic: !s.cinematic })),
+  toggleStarfield: () => set((s) => ({ starfield: !s.starfield })),
 }));

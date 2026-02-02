@@ -11,6 +11,8 @@ import { HelpOverlay } from './components/HelpOverlay';
 import { TouchHandler } from './components/TouchHandler';
 import { A11yAnnouncer } from './components/A11yAnnouncer';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { CinematicBadge } from './components/CinematicBadge';
+import { Starfield } from './visualizers/Starfield';
 import { useStore } from './store/useStore';
 import { themeMap } from './themes/colorThemes';
 import { audioEngine, AudioEngine } from './audio/AudioEngine';
@@ -175,9 +177,11 @@ function App() {
         >
           <color attach="background" args={[colors.background]} />
           <fog attach="fog" args={[colors.background, 8, 25]} />
+          <Starfield />
           <VisualizerScene reducedMotion={prefersReducedMotion} />
         </Canvas>
         {!prefersReducedMotion && <BeatFlash />}
+        <CinematicBadge />
         <ControlPanel />
         <AudioTransport />
         <FullscreenBtn />
