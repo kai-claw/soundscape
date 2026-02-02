@@ -9,10 +9,13 @@ const modeKeys: Record<string, VisualizationMode> = {
   '5': 'tunnel',
 };
 
+const modes: VisualizationMode[] = ['waveform', 'frequency', 'particles', 'kaleidoscope', 'tunnel'];
+
 export function KeyboardHandler() {
   const setMode = useStore((s) => s.setMode);
   const cycleTheme = useStore((s) => s.cycleTheme);
   const togglePlay = useStore((s) => s.togglePlay);
+  const mode = useStore((s) => s.mode);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -27,12 +30,28 @@ export function KeyboardHandler() {
       } else if (e.key === ' ') {
         e.preventDefault();
         togglePlay();
+      } else if (e.key.toLowerCase() === 'f') {
+        // Fullscreen toggle (don't conflict with help overlay which is H)
+        e.preventDefault();
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        const idx = modes.indexOf(mode);
+        setMode(modes[(idx + 1) % modes.length]);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        const idx = modes.indexOf(mode);
+        setMode(modes[(idx - 1 + modes.length) % modes.length]);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [setMode, cycleTheme, togglePlay]);
+  }, [setMode, cycleTheme, togglePlay, mode]);
 
   return null;
 }

@@ -1,62 +1,68 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useStore } from '../store/useStore';
 import { getThemeColor } from '../themes/colorThemes';
+import { audioData } from '../audio/audioData';
 
 const SEGMENTS = 128;
 const WIDTH = 8;
 const RIBBON_DEPTH = 0.8;
 
-export function WaveformRibbon({ timeData, opacity }: { timeData: Uint8Array; opacity: number }) {
+export function WaveformRibbon({ opacity }: { opacity: number }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const theme = useStore((s) => s.theme);
   const sensitivity = useStore((s) => s.sensitivity);
 
   const geometry = useMemo(() => {
-    const geo = new THREE.PlaneGeometry(WIDTH, RIBBON_DEPTH, SEGMENTS, 20);
-    return geo;
+    return new THREE.PlaneGeometry(WIDTH, RIBBON_DEPTH, SEGMENTS, 20);
   }, []);
 
-  const material = useMemo(() => {
-    const c1 = getThemeColor(theme, 0);
-    const c2 = getThemeColor(theme, 1);
-    return new THREE.ShaderMaterial({
-      transparent: true,
-      side: THREE.DoubleSide,
-      uniforms: {
-        uTime: { value: 0 },
-        uOpacity: { value: opacity },
-        uColor1: { value: new THREE.Color(c1[0], c1[1], c1[2]) },
-        uColor2: { value: new THREE.Color(c2[0], c2[1], c2[2]) },
-      },
-      vertexShader: `
-        varying vec2 vUv;
-        varying float vY;
-        void main() {
-          vUv = uv;
-          vY = position.y;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: `
-        uniform float uTime;
-        uniform float uOpacity;
-        uniform vec3 uColor1;
-        uniform vec3 uColor2;
-        varying vec2 vUv;
-        varying float vY;
-        void main() {
-          vec3 color = mix(uColor1, uColor2, vUv.x + sin(uTime) * 0.2);
-          float glow = smoothstep(0.0, 0.3, abs(vY));
-          gl_FragColor = vec4(color, (1.0 - glow * 0.5) * uOpacity);
-        }
-      `,
-    });
-  }, [theme, opacity]);
+  // useMemo for stable material — no ESLint ref-during-render warnings
+  const material = useMemo(() => new THREE.ShaderMaterial({
+    transparent: true,
+    side: THREE.DoubleSide,
+    uniforms: {
+      uTime: { value: 0 },
+      uOpacity: { value: 1 },
+      uColor1: { value: new THREE.Color(1, 0, 1) },
+      uColor2: { value: new THREE.Color(0, 1, 1) },
+    },
+    vertexShader: `
+      varying vec2 vUv;
+      varying float vY;
+      void main() {
+        vUv = uv;
+        vY = position.y;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform float uTime;
+      uniform float uOpacity;
+      uniform vec3 uColor1;
+      uniform vec3 uColor2;
+      varying vec2 vUv;
+      varying float vY;
+      void main() {
+        vec3 color = mix(uColor1, uColor2, vUv.x + sin(uTime) * 0.2);
+        float glow = smoothstep(0.0, 0.3, abs(vY));
+        gl_FragColor = vec4(color, (1.0 - glow * 0.5) * uOpacity);
+      }
+    `,
+  }), []);
+
+  // Dispose on unmount
+  useEffect(() => {
+    return () => {
+      geometry.dispose();
+      material.dispose();
+    };
+  }, [geometry, material]);
 
   useFrame(({ clock }) => {
     if (!meshRef.current) return;
+    const timeData = audioData.time;
     const geo = meshRef.current.geometry;
     const pos = geo.attributes.position;
     const t = clock.getElapsedTime();
@@ -72,7 +78,7 @@ export function WaveformRibbon({ timeData, opacity }: { timeData: Uint8Array; op
     }
     pos.needsUpdate = true;
 
-    material.uniforms.uTime.value = t;
+    material.uniforms.uTime.value = t; // eslint-disable-line react-hooks/immutability -- R3F: shader uniform mutation in useFrame is correct
     material.uniforms.uOpacity.value = opacity;
     const c1 = getThemeColor(theme, 0);
     const c2 = getThemeColor(theme, 1);

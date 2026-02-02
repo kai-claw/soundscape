@@ -194,6 +194,83 @@ html, body, #root {
   color: rgba(255, 255, 255, 0.25);
 }
 
+/* ===== WebGL Context Lost Banner ===== */
+.context-lost-banner {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: rgba(255, 68, 68, 0.15);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  border-radius: 12px;
+  color: #ff6b6b;
+  font-size: 0.85rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.context-lost-reload {
+  padding: 6px 14px;
+  background: rgba(255, 68, 68, 0.2);
+  border: 1px solid rgba(255, 68, 68, 0.4);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.context-lost-reload:hover {
+  background: rgba(255, 68, 68, 0.35);
+}
+
+/* ===== File Error Banner ===== */
+.file-error-banner {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: rgba(255, 140, 0, 0.12);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 140, 0, 0.3);
+  border-radius: 12px;
+  color: #ffaa44;
+  font-size: 0.85rem;
+  animation: fadeIn 0.3s ease;
+  max-width: calc(100% - 64px);
+}
+
+.file-error-dismiss {
+  background: rgba(255, 140, 0, 0.15);
+  border: 1px solid rgba(255, 140, 0, 0.3);
+  border-radius: 6px;
+  color: #ffaa44;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.file-error-dismiss:hover {
+  background: rgba(255, 140, 0, 0.3);
+}
+
 /* ===== Beat Flash ===== */
 .beat-flash {
   position: absolute;
@@ -277,6 +354,13 @@ html, body, #root {
   white-space: nowrap;
   transition: color 0.5s ease;
   animation: bpmPulse 0.5s ease;
+}
+
+.no-signal {
+  font-size: 0.7rem;
+  color: rgba(255, 170, 68, 0.7);
+  white-space: nowrap;
+  animation: fadeIn 0.5s ease;
 }
 
 @keyframes bpmPulse {
@@ -530,6 +614,292 @@ input[type='range']::-webkit-slider-thumb {
   border-color: rgba(255, 255, 255, 0.2);
 }
 
+/* ===== Error Boundary ===== */
+.error-boundary {
+  width: 100vw;
+  height: 100vh;
+  background: #0a0014;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-content {
+  text-align: center;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 40px;
+  max-width: 500px;
+}
+
+.error-icon {
+  font-size: 4rem;
+}
+
+.error-content h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.error-content p {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+}
+
+.error-details {
+  width: 100%;
+  text-align: left;
+}
+
+.error-details summary {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.error-details pre {
+  font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  color: #ff6b6b;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.error-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* ===== Prefers Reduced Motion ===== */
+@media (prefers-reduced-motion: reduce) {
+  .landing-ring,
+  .landing-icon,
+  .landing-title,
+  .landing-content,
+  .control-panel,
+  .audio-transport,
+  .bpm {
+    animation: none !important;
+  }
+
+  .beat-flash {
+    display: none !important;
+  }
+
+  .app {
+    transition: none;
+  }
+}
+
+.reduced-motion .beat-flash {
+  display: none;
+}
+
+/* ===== Screen Reader Only ===== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===== Skip Link ===== */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  z-index: 1000;
+  padding: 8px 16px;
+  background: #fff;
+  color: #000;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 16px;
+  outline: 2px solid #00ffff;
+  outline-offset: 2px;
+}
+
+/* ===== Focus Visible ===== */
+:focus-visible {
+  outline: 2px solid rgba(0, 255, 255, 0.7);
+  outline-offset: 2px;
+}
+
+/* Buttons and interactive elements */
+.landing-btn:focus-visible,
+.source-toggle button:focus-visible,
+.mode-grid button:focus-visible,
+.theme-grid button:focus-visible,
+.play-btn:focus-visible,
+.fullscreen-btn:focus-visible,
+.help-close:focus-visible {
+  outline: 2px solid rgba(0, 255, 255, 0.8);
+  outline-offset: 2px;
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.3);
+}
+
+input[type='range']:focus-visible {
+  outline: 2px solid rgba(0, 255, 255, 0.7);
+  outline-offset: 4px;
+}
+
+/* ===== Help Overlay ===== */
+.help-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.help-content {
+  background: rgba(15, 15, 30, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 28px 32px;
+  max-width: 440px;
+  width: 90%;
+  color: #fff;
+  animation: slideUp 0.25s ease;
+}
+
+.help-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.help-header h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.help-close {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.help-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.help-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.help-table th {
+  text-align: left;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.help-table td {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.help-table kbd {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Menlo', monospace;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.help-footer {
+  margin-top: 16px;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+}
+
+.help-footer kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  font-family: 'SF Mono', 'Menlo', monospace;
+  font-size: 0.65rem;
+}
+
+/* ===== Forced Colors / High Contrast ===== */
+@media (forced-colors: active) {
+  .landing-btn,
+  .source-toggle button,
+  .mode-grid button,
+  .theme-grid button,
+  .play-btn,
+  .fullscreen-btn,
+  .help-close {
+    border: 1px solid ButtonText;
+    color: ButtonText;
+    background: ButtonFace;
+  }
+
+  .landing-btn.primary:hover,
+  .landing-btn.secondary:hover {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .control-panel,
+  .audio-transport,
+  .help-content {
+    border: 1px solid ButtonText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .level-fill {
+    background: Highlight !important;
+  }
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 600px) {
   .landing-title {
@@ -550,6 +920,9 @@ input[type='range']::-webkit-slider-thumb {
     min-width: unset;
     width: 100%;
     justify-content: center;
+    /* Larger touch targets */
+    padding: 18px 28px;
+    min-height: 56px;
   }
 
   .landing-features {
@@ -578,8 +951,27 @@ input[type='range']::-webkit-slider-thumb {
     grid-template-columns: 1fr 1fr 1fr;
   }
 
+  .mode-grid button {
+    /* Touch-friendly: 44px minimum tap target */
+    min-height: 44px;
+    padding: 10px 4px;
+  }
+
   .theme-grid {
     grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+
+  .theme-grid button {
+    min-height: 44px;
+  }
+
+  .source-toggle button {
+    min-height: 44px;
+  }
+
+  .play-btn {
+    min-height: 48px;
+    font-size: 0.9rem;
   }
 
   .audio-transport {
@@ -592,5 +984,39 @@ input[type='range']::-webkit-slider-thumb {
 
   .fullscreen-btn {
     top: 60px;
+    /* Larger touch target on mobile */
+    width: 48px;
+    height: 48px;
+    font-size: 1.4rem;
+  }
+
+  .help-content {
+    padding: 20px 24px;
+    width: 95%;
+  }
+
+  .shortcuts-hint {
+    font-size: 0.55rem;
+  }
+}
+
+/* ===== Very Small Screens ===== */
+@media (max-width: 380px) {
+  .landing-title {
+    font-size: 2rem;
+  }
+
+  .landing-icon {
+    font-size: 3rem;
+  }
+
+  .control-panel {
+    padding: 10px;
+    gap: 8px;
+    max-height: 45vh;
+  }
+
+  .mode-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }

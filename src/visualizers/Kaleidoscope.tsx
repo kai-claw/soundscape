@@ -1,48 +1,75 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useStore } from '../store/useStore';
 import { getThemeColor } from '../themes/colorThemes';
+import { audioData } from '../audio/audioData';
 
 const MIRRORS = 8;
 const SHAPES_PER_MIRROR = 6;
 
-export function Kaleidoscope({ freqData, opacity }: { freqData: Uint8Array; opacity: number }) {
+interface MeshItem {
+  geo: THREE.BufferGeometry;
+  mat: THREE.MeshStandardMaterial;
+  mirror: number;
+  idx: number;
+}
+
+function createMeshData(): MeshItem[] {
+  const items: MeshItem[] = [];
+  const geos = [
+    new THREE.OctahedronGeometry(0.3, 0),
+    new THREE.TetrahedronGeometry(0.25, 0),
+    new THREE.IcosahedronGeometry(0.2, 0),
+    new THREE.TorusGeometry(0.2, 0.08, 8, 16),
+    new THREE.ConeGeometry(0.15, 0.4, 6),
+    new THREE.DodecahedronGeometry(0.2, 0),
+  ];
+
+  for (let m = 0; m < MIRRORS; m++) {
+    for (let s = 0; s < SHAPES_PER_MIRROR; s++) {
+      items.push({
+        geo: geos[s % geos.length],
+        mat: new THREE.MeshStandardMaterial({
+          transparent: true,
+          metalness: 0.8,
+          roughness: 0.2,
+          emissiveIntensity: 0.5,
+        }),
+        mirror: m,
+        idx: s,
+      });
+    }
+  }
+  return items;
+}
+
+export function Kaleidoscope({ opacity }: { opacity: number }) {
   const groupRef = useRef<THREE.Group>(null);
   const theme = useStore((s) => s.theme);
   const sensitivity = useStore((s) => s.sensitivity);
 
-  const meshes = useMemo(() => {
-    const items: { geo: THREE.BufferGeometry; mat: THREE.MeshStandardMaterial; mirror: number; idx: number }[] = [];
-    const geos = [
-      new THREE.OctahedronGeometry(0.3, 0),
-      new THREE.TetrahedronGeometry(0.25, 0),
-      new THREE.IcosahedronGeometry(0.2, 0),
-      new THREE.TorusGeometry(0.2, 0.08, 8, 16),
-      new THREE.ConeGeometry(0.15, 0.4, 6),
-      new THREE.DodecahedronGeometry(0.2, 0),
-    ];
+  // useMemo instead of lazy-init ref — eliminates ESLint ref-during-render warnings
+  // while maintaining the same "create once" semantics.
+  const meshes = useMemo(() => createMeshData(), []);
 
-    for (let m = 0; m < MIRRORS; m++) {
-      for (let s = 0; s < SHAPES_PER_MIRROR; s++) {
-        items.push({
-          geo: geos[s % geos.length],
-          mat: new THREE.MeshStandardMaterial({
-            transparent: true,
-            metalness: 0.8,
-            roughness: 0.2,
-            emissiveIntensity: 0.5,
-          }),
-          mirror: m,
-          idx: s,
-        });
+  // Dispose geometries and materials on unmount to prevent GPU memory leak
+  useEffect(() => {
+    return () => {
+      const seenGeos = new Set<THREE.BufferGeometry>();
+      for (const item of meshes) {
+        if (!seenGeos.has(item.geo)) {
+          item.geo.dispose();
+          seenGeos.add(item.geo);
+        }
+        item.mat.dispose();
       }
-    }
-    return items;
-  }, []);
+    };
+  }, [meshes]);
 
   useFrame(({ clock }) => {
     if (!groupRef.current) return;
+    const freqData = audioData.freq;
     const t = clock.getElapsedTime();
     const children = groupRef.current.children;
 
@@ -67,9 +94,9 @@ export function Kaleidoscope({ freqData, opacity }: { freqData: Uint8Array; opac
 
       const cIdx = (mirror + idx) % 4;
       const c = getThemeColor(theme, cIdx);
-      (mat as THREE.MeshStandardMaterial).color.setRGB(c[0], c[1], c[2]);
-      (mat as THREE.MeshStandardMaterial).emissive.setRGB(c[0] * 0.3, c[1] * 0.3, c[2] * 0.3);
-      (mat as THREE.MeshStandardMaterial).opacity = opacity;
+      mat.color.setRGB(c[0], c[1], c[2]);
+      mat.emissive.setRGB(c[0] * 0.3, c[1] * 0.3, c[2] * 0.3);
+      mat.opacity = opacity; // eslint-disable-line react-hooks/immutability -- R3F: Three.js material mutation in useFrame is correct
     }
   });
 

@@ -107,10 +107,17 @@ class MockAudioContext {
 Object.defineProperty(globalThis, 'AudioContext', { value: MockAudioContext, writable: true });
 
 // Mock navigator.mediaDevices
+const mockTrack = {
+  stop: () => {},
+  addEventListener: () => {},
+  removeEventListener: () => {},
+  kind: 'audio' as const,
+};
 Object.defineProperty(navigator, 'mediaDevices', {
   value: {
     getUserMedia: async () => ({
-      getTracks: () => [{ stop: () => {} }],
+      getTracks: () => [mockTrack],
+      getAudioTracks: () => [mockTrack],
     }),
   },
   writable: true,

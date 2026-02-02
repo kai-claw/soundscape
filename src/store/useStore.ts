@@ -18,6 +18,8 @@ interface AppState {
   midLevel: number;
   highLevel: number;
   fileName: string | null;
+  /** True when audio source is connected but no signal is detected */
+  noSignal: boolean;
 
   setMode: (mode: VisualizationMode) => void;
   cycleTheme: () => void;
@@ -30,8 +32,11 @@ interface AppState {
   setBassLevel: (level: number) => void;
   setMidLevel: (level: number) => void;
   setHighLevel: (level: number) => void;
+  /** Batch audio update — single set() call per frame instead of 4 */
+  setAudioLevels: (level: number, bass: number, mid: number, high: number) => void;
   setTransitionProgress: (val: number) => void;
   setFileName: (name: string | null) => void;
+  setNoSignal: (noSignal: boolean) => void;
 }
 
 const themes: ColorTheme[] = ['neon', 'sunset', 'ocean', 'monochrome'];
@@ -50,6 +55,7 @@ export const useStore = create<AppState>((set, get) => ({
   midLevel: 0,
   highLevel: 0,
   fileName: null,
+  noSignal: false,
 
   setMode: (mode) => {
     const current = get().mode;
@@ -69,6 +75,9 @@ export const useStore = create<AppState>((set, get) => ({
   setBassLevel: (bassLevel) => set({ bassLevel }),
   setMidLevel: (midLevel) => set({ midLevel }),
   setHighLevel: (highLevel) => set({ highLevel }),
+  setAudioLevels: (audioLevel, bassLevel, midLevel, highLevel) =>
+    set({ audioLevel, bassLevel, midLevel, highLevel }),
   setTransitionProgress: (transitionProgress) => set({ transitionProgress }),
   setFileName: (fileName) => set({ fileName }),
+  setNoSignal: (noSignal) => set({ noSignal }),
 }));

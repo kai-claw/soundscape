@@ -18,22 +18,41 @@ export function AudioTransport() {
   const [duration, setDuration] = useState(0);
   const [seeking, setSeeking] = useState(false);
   const rafRef = useRef<number>(0);
+  const seekingRef = useRef(false);
+  const isVisible = audioSource === 'file' && !!fileName;
 
-  const updateTime = useCallback(() => {
-    const el = audioEngine.audioElement;
-    if (el && !seeking) {
-      setCurrentTime(el.currentTime);
-      if (el.duration && isFinite(el.duration)) {
-        setDuration(el.duration);
-      }
-    }
-    rafRef.current = requestAnimationFrame(updateTime);
+  // Keep ref in sync with state for rAF loop access
+  useEffect(() => {
+    seekingRef.current = seeking;
   }, [seeking]);
 
+  // rAF-based time update loop — only runs when transport is visible
   useEffect(() => {
-    rafRef.current = requestAnimationFrame(updateTime);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [updateTime]);
+    if (!isVisible) {
+      // Cancel any pending frame when transport hides
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = 0;
+      }
+      return;
+    }
+
+    const tick = () => {
+      const el = audioEngine.audioElement;
+      if (el && !seekingRef.current) {
+        setCurrentTime(el.currentTime);
+        if (el.duration && isFinite(el.duration)) {
+          setDuration(el.duration);
+        }
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
+    };
+  }, [isVisible]);
 
   const handleSeek = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value);
@@ -43,12 +62,12 @@ export function AudioTransport() {
     }
   }, []);
 
-  if (audioSource !== 'file' || !fileName) return null;
+  if (!isVisible) return null;
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="audio-transport">
+    <div className="audio-transport" role="region" aria-label="Audio playback controls">
       <div className="transport-track-name">{fileName}</div>
       <div className="transport-bar">
         <span className="transport-time">{formatTime(currentTime)}</span>
@@ -72,6 +91,11 @@ export function AudioTransport() {
             onMouseUp={() => setSeeking(false)}
             onTouchStart={() => setSeeking(true)}
             onTouchEnd={() => setSeeking(false)}
+            aria-label={`Seek position: ${formatTime(currentTime)} of ${formatTime(duration)}`}
+            aria-valuemin={0}
+            aria-valuemax={duration || 0}
+            aria-valuenow={currentTime}
+            aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
           />
         </div>
         <span className="transport-time">{formatTime(duration)}</span>

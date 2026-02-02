@@ -1,38 +1,56 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useStore } from '../store/useStore';
 import { getThemeColor } from '../themes/colorThemes';
+import { audioData } from '../audio/audioData';
 
 const RINGS = 30;
 const RING_SEGMENTS = 32;
 
-export function Tunnel({ freqData, opacity }: { freqData: Uint8Array; opacity: number }) {
+interface RingItem {
+  mat: THREE.MeshStandardMaterial;
+}
+
+function createRings(): RingItem[] {
+  const items: RingItem[] = [];
+  for (let i = 0; i < RINGS; i++) {
+    items.push({
+      mat: new THREE.MeshStandardMaterial({
+        transparent: true,
+        side: THREE.DoubleSide,
+        wireframe: true,
+        metalness: 0.5,
+        roughness: 0.5,
+      }),
+    });
+  }
+  return items;
+}
+
+export function Tunnel({ opacity }: { opacity: number }) {
   const groupRef = useRef<THREE.Group>(null);
   const theme = useStore((s) => s.theme);
   const sensitivity = useStore((s) => s.sensitivity);
   const bassLevel = useStore((s) => s.bassLevel);
 
-  const rings = useMemo(() => {
-    const items: { mat: THREE.MeshStandardMaterial }[] = [];
-    for (let i = 0; i < RINGS; i++) {
-      items.push({
-        mat: new THREE.MeshStandardMaterial({
-          transparent: true,
-          side: THREE.DoubleSide,
-          wireframe: true,
-          metalness: 0.5,
-          roughness: 0.5,
-        }),
-      });
-    }
-    return items;
-  }, []);
-
+  // useMemo instead of lazy-init ref — same "create once" semantics, no ESLint warnings
+  const rings = useMemo(() => createRings(), []);
   const ringGeo = useMemo(() => new THREE.TorusGeometry(1, 0.02, 4, RING_SEGMENTS), []);
+
+  // Dispose geometry and materials on unmount
+  useEffect(() => {
+    return () => {
+      ringGeo.dispose();
+      for (const ring of rings) {
+        ring.mat.dispose();
+      }
+    };
+  }, [ringGeo, rings]);
 
   useFrame(({ clock }) => {
     if (!groupRef.current) return;
+    const freqData = audioData.freq;
     const t = clock.getElapsedTime();
     const children = groupRef.current.children;
 
@@ -56,7 +74,7 @@ export function Tunnel({ freqData, opacity }: { freqData: Uint8Array; opacity: n
       const glow = 0.3 + freq * 0.7;
       rings[i].mat.color.setRGB(c[0] * glow, c[1] * glow, c[2] * glow);
       rings[i].mat.emissive.setRGB(c[0] * freq * 0.5, c[1] * freq * 0.5, c[2] * freq * 0.5);
-      rings[i].mat.emissiveIntensity = freq * 2;
+      rings[i].mat.emissiveIntensity = freq * 2; // eslint-disable-line react-hooks/immutability -- R3F: Three.js material mutation in useFrame is correct
       rings[i].mat.opacity = opacity * (0.3 + freq * 0.7) * (1 - Math.abs(depth) / 12);
     }
   });

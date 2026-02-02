@@ -33,6 +33,7 @@ export function ControlPanel() {
   const setAudioSource = useStore((s) => s.setAudioSource);
   const togglePlay = useStore((s) => s.togglePlay);
   const setFileName = useStore((s) => s.setFileName);
+  const noSignal = useStore((s) => s.noSignal);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const themeColors = themeMap[theme];
@@ -56,7 +57,7 @@ export function ControlPanel() {
   }, [setAudioSource, setFileName]);
 
   return (
-    <div className="control-panel" style={{ borderColor: themeColors.primary + '40' }}>
+    <div id="controls" className="control-panel" role="region" aria-label="Visualizer Controls" tabIndex={-1} style={{ borderColor: themeColors.primary + '40' }}>
       <div className="panel-header">
         <h2 style={{ color: themeColors.primary }}>SoundScape</h2>
         <div className="status-bar">
@@ -69,7 +70,12 @@ export function ControlPanel() {
               }}
             />
           </div>
-          {bpm > 0 && (
+          {noSignal && (
+            <span className="no-signal" title="No audio signal detected">
+              🔇 No signal
+            </span>
+          )}
+          {bpm > 0 && !noSignal && (
             <span className="bpm" style={{ color: themeColors.accent }}>
               {bpm} BPM
             </span>
@@ -78,8 +84,8 @@ export function ControlPanel() {
       </div>
 
       <div className="control-section">
-        <label>Audio Source</label>
-        <div className="source-toggle">
+        <label id="source-label">Audio Source</label>
+        <div className="source-toggle" role="group" aria-labelledby="source-label">
           <button
             className={audioSource === 'mic' ? 'active' : ''}
             onClick={handleMicConnect}
@@ -106,30 +112,34 @@ export function ControlPanel() {
       </div>
 
       <div className="control-section">
-        <label>Mode <span className="hint">(1-5)</span></label>
-        <div className="mode-grid">
+        <label id="mode-label">Mode <span className="hint">(1-5)</span></label>
+        <div className="mode-grid" role="group" aria-labelledby="mode-label">
           {modes.map((m) => (
             <button
               key={m.id}
               className={mode === m.id ? 'active' : ''}
               onClick={() => setMode(m.id)}
+              aria-pressed={mode === m.id}
+              aria-label={`${m.label} mode (key ${m.key})`}
               style={mode === m.id ? { background: themeColors.primary + '30', borderColor: themeColors.primary } : {}}
             >
               {m.label}
-              <span className="key-hint">{m.key}</span>
+              <span className="key-hint" aria-hidden="true">{m.key}</span>
             </button>
           ))}
         </div>
       </div>
 
       <div className="control-section">
-        <label>Theme <span className="hint">(T)</span></label>
-        <div className="theme-grid">
+        <label id="theme-label">Theme <span className="hint">(T)</span></label>
+        <div className="theme-grid" role="group" aria-labelledby="theme-label">
           {themes.map((t) => (
             <button
               key={t.id}
               className={theme === t.id ? 'active' : ''}
               onClick={() => setTheme(t.id)}
+              aria-pressed={theme === t.id}
+              aria-label={`${t.label} theme`}
               style={theme === t.id ? { background: themeMap[t.id].primary + '30', borderColor: themeMap[t.id].primary } : {}}
             >
               {t.label}
@@ -139,9 +149,10 @@ export function ControlPanel() {
       </div>
 
       <div className="control-section">
-        <label>Sensitivity: {sensitivity.toFixed(1)}x</label>
+        <label id="sensitivity-label">Sensitivity: {sensitivity.toFixed(1)}x</label>
         <input
           type="range"
+          aria-labelledby="sensitivity-label"
           min="0.1"
           max="3.0"
           step="0.1"
@@ -155,15 +166,17 @@ export function ControlPanel() {
         <button
           className="play-btn"
           onClick={togglePlay}
+          aria-label={isPlaying ? 'Pause audio (Space)' : 'Play audio (Space)'}
           style={{ background: themeColors.primary + '20', borderColor: themeColors.primary }}
         >
-          {isPlaying ? '⏸ Pause' : '▶ Play'} <span className="hint">(Space)</span>
+          {isPlaying ? '⏸ Pause' : '▶ Play'} <span className="hint" aria-hidden="true">(Space)</span>
         </button>
       </div>
 
-      <div className="shortcuts-hint">
+      <div className="shortcuts-hint" aria-hidden="true">
         <span>1-5: Modes</span>
         <span>T: Theme</span>
+        <span>H: Help</span>
         <span>Space: Pause</span>
       </div>
     </div>

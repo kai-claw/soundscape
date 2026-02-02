@@ -18,7 +18,13 @@ export function FullscreenBtn() {
   }, []);
 
   return (
-    <button className="fullscreen-btn" onClick={toggle} title={isFs ? 'Exit fullscreen' : 'Fullscreen'}>
+    <button
+      className="fullscreen-btn"
+      onClick={toggle}
+      title={isFs ? 'Exit fullscreen' : 'Fullscreen'}
+      aria-label={isFs ? 'Exit fullscreen' : 'Enter fullscreen'}
+      aria-pressed={isFs}
+    >
       {isFs ? '⊡' : '⛶'}
     </button>
   );

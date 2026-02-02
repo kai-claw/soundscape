@@ -39,7 +39,7 @@ export function LandingScreen({ onStart }: { onStart: () => void }) {
   }, [onStart, setAudioSource, setFileName]);
 
   return (
-    <div className="landing">
+    <div className="landing" role="main" aria-label="SoundScape - Audio-Reactive 3D Visualizer">
       <div className="landing-bg">
         {Array.from({ length: 40 }).map((_, i) => (
           <div
@@ -67,6 +67,7 @@ export function LandingScreen({ onStart }: { onStart: () => void }) {
             className="landing-btn primary"
             onClick={handleMic}
             disabled={loading}
+            aria-label="Use microphone for live audio visualization"
           >
             <span className="btn-icon">🎤</span>
             <span className="btn-text">
@@ -79,6 +80,7 @@ export function LandingScreen({ onStart }: { onStart: () => void }) {
             className="landing-btn secondary"
             onClick={() => fileInputRef.current?.click()}
             disabled={loading}
+            aria-label="Upload audio file for visualization"
           >
             <span className="btn-icon">📁</span>
             <span className="btn-text">

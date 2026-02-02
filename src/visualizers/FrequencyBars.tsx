@@ -1,14 +1,15 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useStore } from '../store/useStore';
 import { getThemeColor } from '../themes/colorThemes';
+import { audioData } from '../audio/audioData';
 
 const GRID = 16;
 const SPACING = 0.35;
 const BAR_SIZE = 0.25;
 
-export function FrequencyBars({ freqData, opacity }: { freqData: Uint8Array; opacity: number }) {
+export function FrequencyBars({ opacity }: { opacity: number }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const theme = useStore((s) => s.theme);
   const sensitivity = useStore((s) => s.sensitivity);
@@ -17,12 +18,22 @@ export function FrequencyBars({ freqData, opacity }: { freqData: Uint8Array; opa
   const count = GRID * GRID;
   const tempColor = useMemo(() => new THREE.Color(), []);
 
-  const colorArray = useMemo(() => {
-    return new Float32Array(count * 3);
-  }, [count]);
+  // Pre-allocate color array in a ref — mutated per-frame in useFrame
+  const colorArrayRef = useRef(new Float32Array(count * 3));
+  const colorAttrRef = useRef<THREE.InstancedBufferAttribute | null>(null);
+
+  // Set up the color attribute once on mount
+  useEffect(() => {
+    if (!meshRef.current) return;
+    const attr = new THREE.InstancedBufferAttribute(colorArrayRef.current, 3);
+    meshRef.current.geometry.setAttribute('color', attr);
+    colorAttrRef.current = attr;
+  }, []);
 
   useFrame(() => {
     if (!meshRef.current) return;
+    const freqData = audioData.freq;
+    const colorArray = colorArrayRef.current;
     const c0 = getThemeColor(theme, 0);
     const c1 = getThemeColor(theme, 1);
     const c2 = getThemeColor(theme, 2);
@@ -55,10 +66,10 @@ export function FrequencyBars({ freqData, opacity }: { freqData: Uint8Array; opa
       }
     }
     meshRef.current.instanceMatrix.needsUpdate = true;
-    meshRef.current.geometry.setAttribute(
-      'color',
-      new THREE.InstancedBufferAttribute(colorArray, 3)
-    );
+    // Reuse existing attribute — just flag for GPU upload
+    if (colorAttrRef.current) {
+      colorAttrRef.current.needsUpdate = true;
+    }
   });
 
   return (
