@@ -7,6 +7,8 @@ const modeNames: Record<string, string> = {
   particles: 'Particle Field',
   kaleidoscope: 'Kaleidoscope',
   tunnel: 'Tunnel',
+  waterfall: 'Spectrum Waterfall',
+  flame: 'Audio Flame',
 };
 
 const themeNames: Record<string, string> = {
@@ -14,6 +16,8 @@ const themeNames: Record<string, string> = {
   sunset: 'Sunset',
   ocean: 'Ocean',
   monochrome: 'Monochrome',
+  arctic: 'Arctic',
+  forest: 'Forest',
 };
 
 /**
@@ -24,8 +28,18 @@ export function A11yAnnouncer() {
   const mode = useStore((s) => s.mode);
   const theme = useStore((s) => s.theme);
   const isPlaying = useStore((s) => s.isPlaying);
+  const cinematic = useStore((s) => s.cinematic);
+  const starfield = useStore((s) => s.starfield);
+  const orbitRing = useStore((s) => s.orbitRing);
+  const beatPulse = useStore((s) => s.beatPulse);
+  const shockwave = useStore((s) => s.shockwave);
   const announceRef = useRef<HTMLDivElement>(null);
   const initialRef = useRef(true);
+
+  const announce = (text: string) => {
+    if (initialRef.current || !announceRef.current) return;
+    announceRef.current.textContent = text;
+  };
 
   useEffect(() => {
     // Skip initial mount announcement
@@ -33,24 +47,36 @@ export function A11yAnnouncer() {
       initialRef.current = false;
       return;
     }
-    if (announceRef.current) {
-      announceRef.current.textContent = `Visualization mode: ${modeNames[mode] ?? mode}`;
-    }
+    announce(`Visualization mode: ${modeNames[mode] ?? mode}`);
   }, [mode]);
 
   useEffect(() => {
-    if (initialRef.current) return;
-    if (announceRef.current) {
-      announceRef.current.textContent = `Color theme: ${themeNames[theme] ?? theme}`;
-    }
+    announce(`Color theme: ${themeNames[theme] ?? theme}`);
   }, [theme]);
 
   useEffect(() => {
-    if (initialRef.current) return;
-    if (announceRef.current) {
-      announceRef.current.textContent = isPlaying ? 'Audio resumed' : 'Audio paused';
-    }
+    announce(isPlaying ? 'Audio resumed' : 'Audio paused');
   }, [isPlaying]);
+
+  useEffect(() => {
+    announce(`Cinematic autoplay ${cinematic ? 'on' : 'off'}`);
+  }, [cinematic]);
+
+  useEffect(() => {
+    announce(`Starfield ${starfield ? 'on' : 'off'}`);
+  }, [starfield]);
+
+  useEffect(() => {
+    announce(`Orbit ring ${orbitRing ? 'on' : 'off'}`);
+  }, [orbitRing]);
+
+  useEffect(() => {
+    announce(`Beat pulse ${beatPulse ? 'on' : 'off'}`);
+  }, [beatPulse]);
+
+  useEffect(() => {
+    announce(`Shockwave ${shockwave ? 'on' : 'off'}`);
+  }, [shockwave]);
 
   return (
     <div

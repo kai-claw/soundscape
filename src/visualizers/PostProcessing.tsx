@@ -30,6 +30,10 @@ export function PostProcessing({ reducedMotion = false }: Props) {
   const sensitivity = useStore((s) => s.sensitivity);
   const perfSettings = useStore((s) => s.performanceSettings);
 
+  // Stable Vector2 — created once via useMemo, mutated per-frame via AberrationUpdater
+  // MUST be called before any conditional returns (Rules of Hooks)
+  const offset = useMemo(() => new Vector2(0, 0), []);
+
   // Performance mode: skip post-processing entirely on low-end GPUs
   if (!perfSettings.enablePostProcessing) {
     return null;
@@ -39,20 +43,26 @@ export function PostProcessing({ reducedMotion = false }: Props) {
   // Clamp bloom to 3.0 max to prevent whiteout at high sensitivity + bass
   const bloomIntensity = reducedMotion ? 0.6 : Math.min(3.0, 0.8 + bassLevel * sensitivity * 2.0);
 
-  // Stable Vector2 — created once via useMemo, mutated per-frame via AberrationUpdater
-  const offset = useMemo(() => new Vector2(0, 0), []);
-
   if (reducedMotion || !perfSettings.enableChromatic) {
+    if (!perfSettings.enableBloom) {
+      return (
+        <EffectComposer multisampling={0}>
+          <Vignette
+            offset={0.3}
+            darkness={0.7}
+            blendFunction={BlendFunction.NORMAL}
+          />
+        </EffectComposer>
+      );
+    }
     return (
       <EffectComposer multisampling={0}>
-        {perfSettings.enableBloom && (
-          <Bloom
-            intensity={bloomIntensity}
-            luminanceThreshold={0.2}
-            luminanceSmoothing={0.9}
-            mipmapBlur
-          />
-        )}
+        <Bloom
+          intensity={bloomIntensity}
+          luminanceThreshold={0.2}
+          luminanceSmoothing={0.9}
+          mipmapBlur
+        />
         <Vignette
           offset={0.3}
           darkness={0.7}

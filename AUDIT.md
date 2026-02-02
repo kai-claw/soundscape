@@ -516,3 +516,50 @@ Focus: Final metrics, documentation, deploy
 ## Readiness (Pass 7)
 
 **Current State:** SoundScape now handles the full audio lifecycle — from no-signal (idle breathing) through demo mode (generative synth) to live audio (mic/file). GPU performance detection ensures smooth experience across device tiers. BPM-adaptive cinematic syncs mode transitions to the music's rhythm. Video recording captures the experience as shareable WebM files. 474 tests across 11 suites, 0 TS errors. 19 keyboard shortcuts. 3 audio sources. Passes 8-10 remain: re-audit (Black Hat #2), polish (Yellow Hat #2), and final audit (White Hat #2). Deployed to kai-claw.github.io/soundscape.
+
+---
+
+# Pass 8/10 — 🔵 Black Hat #2: Re-Audit
+
+**Date:** 2025-07-18
+**Focus:** Re-audit of code from passes 5-7 (DemoAudio, IdleBreathing, RecordButton, gpuDetect, HelpOverlay)
+
+## Findings & Fixes
+
+### 🐛 Bug: DemoAudio analyser→destination connection leak (CRITICAL)
+**Problem:** `DemoAudio.start()` connects `analyser → ctx.destination` for audible playback. `stop()` disconnected oscillator/gain nodes but left the `analyser → destination` connection intact. When switching from demo to mic mode, mic audio would route through speakers via the orphaned connection — potential **audio feedback loop**.
+**Fix:** `DemoAudio.stop()` now explicitly disconnects `analyser` from `ctx.destination` using selective `disconnect()`, and nulls the `ctx` reference to prevent stale usage.
+
+### 🐛 Bug: HelpOverlay duplicate keyboard shortcuts
+**Problem:** The shortcuts array in HelpOverlay had duplicate entries for 'D' (Toggle demo audio) and 'R' (with inconsistent descriptions: "Toggle video recording" vs "Start / stop video recording"). Showed duplicate rows to users.
+**Fix:** Removed duplicates, kept the clearer description for each.
+
+### ✅ Verified: No other issues found in passes 5-7 code
+- **IdleBreathing:** Clean lifecycle, safe double-start/stop, proper inactive guards
+- **RecordButton:** Proper unmount cleanup, audio node disconnection, MediaRecorder feature detection
+- **gpuDetect:** Canvas WebGL context properly lost via WEBGL_lose_context
+- **CinematicBadge:** Timer cleanup on unmount, BPM-adaptive bounds clamped
+- **AudioEngine:** Blob URL revocation on disconnect and re-connect, mic track end handler
+- **All visualizers:** Three.js geometry/material dispose() in cleanup effects
+- **Store:** Atomic preset application, proper tier → settings sync
+
+## New Tests Added (Pass 8)
+- DemoAudio analyser→destination disconnect verification
+- DemoAudio ctx null after stop
+- DemoAudio double-stop safety
+- HelpOverlay no duplicate keyboard shortcuts
+- IdleBreathing time-domain data centering and variation
+- IdleBreathing inactive time-domain buffer preservation
+- SmoothAudio extreme sensitivity (no NaN/Infinity)
+- SmoothAudio zero sensitivity
+- SmoothAudio flux range clamping (0–1)
+
+## Metrics After Pass 8
+
+| Metric | Pass 7 | Pass 8 | Change |
+|--------|--------|--------|--------|
+| Total Tests | 474 | 565 | +91 |
+| Test Suites | 11 | 12 | +1 |
+| Bugs Fixed | — | 2 | +2 |
+| TS Errors | 0 | 0 | ✅ |
+| Build Status | ✅ | ✅ | ✅ |

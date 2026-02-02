@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useStore, type VisualizationMode } from '../store/useStore';
 
-const modes: VisualizationMode[] = ['waveform', 'frequency', 'particles', 'kaleidoscope', 'tunnel'];
+const modes: VisualizationMode[] = ['waveform', 'frequency', 'particles', 'kaleidoscope', 'tunnel', 'waterfall', 'flame'];
 const SWIPE_THRESHOLD = 60;
 const SWIPE_TIMEOUT_MS = 400;
 

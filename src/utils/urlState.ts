@@ -85,15 +85,15 @@ export function parseUrlConfig(): UrlConfig | null {
     }
   }
 
-  // Effects flags
+  // Effects flags — only set flags that are explicitly present in the string
+  // to avoid overriding user's current settings for unmentioned effects
   const fx = params.get('fx');
   if (fx) {
-    config.cinematic = fx.includes('c');
-    config.starfield = fx.includes('s');
-    config.orbitRing = fx.includes('o');
-    config.beatPulse = fx.includes('b');
-    config.shockwave = fx.includes('w');
-    hasAny = true;
+    if (fx.includes('c')) { config.cinematic = true; hasAny = true; }
+    if (fx.includes('s')) { config.starfield = true; hasAny = true; }
+    if (fx.includes('o')) { config.orbitRing = true; hasAny = true; }
+    if (fx.includes('b')) { config.beatPulse = true; hasAny = true; }
+    if (fx.includes('w')) { config.shockwave = true; hasAny = true; }
   }
 
   return hasAny ? config : null;

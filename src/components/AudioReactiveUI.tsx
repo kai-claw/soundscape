@@ -16,7 +16,6 @@ export function AudioReactiveUI() {
   const highLevel = useStore((s) => s.highLevel);
   const theme = useStore((s) => s.theme);
   const colors = themeMap[theme];
-  const rafRef = useRef(0);
   const smoothBassRef = useRef(0);
   const smoothLevelRef = useRef(0);
   const smoothHighRef = useRef(0);
@@ -54,10 +53,6 @@ export function AudioReactiveUI() {
     root.style.setProperty('--theme-primary', colors.primary);
     root.style.setProperty('--theme-secondary', colors.secondary);
     root.style.setProperty('--theme-accent', colors.accent);
-
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-    };
   }, [bassLevel, audioLevel, highLevel, colors]);
 
   return null; // Pure side-effect component

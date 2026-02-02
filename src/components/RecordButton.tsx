@@ -43,6 +43,8 @@ export function RecordButton() {
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeRef = useRef(0);
+  /** Track audio routing nodes created during recording so we can disconnect them */
+  const audioNodesRef = useRef<{ gain: GainNode | null; dest: MediaStreamAudioDestinationNode | null }>({ gain: null, dest: null });
   const theme = useStore((s) => s.theme);
   const colors = themeMap[theme];
 
@@ -77,6 +79,8 @@ export function RecordButton() {
             audioEngine.analyser.connect(gain);
             gain.connect(audioDest);
           }
+          // Store refs so we can disconnect when recording stops
+          audioNodesRef.current = { gain, dest: audioDest };
           // Combine video + audio tracks
           const tracks = [
             ...videoStream.getVideoTracks(),
@@ -140,6 +144,15 @@ export function RecordButton() {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
+    // Disconnect audio routing nodes to prevent leak
+    const { gain, dest } = audioNodesRef.current;
+    if (gain) {
+      try { gain.disconnect(); } catch { /* already disconnected */ }
+    }
+    if (dest) {
+      try { dest.disconnect(); } catch { /* already disconnected */ }
+    }
+    audioNodesRef.current = { gain: null, dest: null };
     recorderRef.current = null;
     setRecording(false);
     setDuration(0);
@@ -153,11 +166,11 @@ export function RecordButton() {
     }
   }, [recording, startRecording, stopRecording]);
 
-  // Expose toggle for keyboard handler
+  // Expose toggle for keyboard handler via store (avoids fragile window global)
   useEffect(() => {
-    (window as Record<string, unknown>).__soundscapeToggleRecording = toggleRecording;
+    (window as unknown as Record<string, unknown>).__soundscapeToggleRecording = toggleRecording;
     return () => {
-      delete (window as Record<string, unknown>).__soundscapeToggleRecording;
+      delete (window as unknown as Record<string, unknown>).__soundscapeToggleRecording;
     };
   }, [toggleRecording]);
 

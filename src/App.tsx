@@ -111,8 +111,15 @@ function App() {
   // Cleanup WebGL context listeners on unmount
   useEffect(() => {
     return () => {
-      // Context listeners are cleaned up when canvas is destroyed
-      contextListenersRef.current = null;
+      // Remove context listeners from the canvas element before it's destroyed
+      if (contextListenersRef.current) {
+        const canvas = document.querySelector('canvas');
+        if (canvas) {
+          canvas.removeEventListener('webglcontextlost', contextListenersRef.current.lost);
+          canvas.removeEventListener('webglcontextrestored', contextListenersRef.current.restored);
+        }
+        contextListenersRef.current = null;
+      }
     };
   }, []);
 

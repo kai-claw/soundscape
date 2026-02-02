@@ -114,7 +114,7 @@ export function KeyboardHandler() {
       } else if (e.key.toLowerCase() === 'r') {
         // R: toggle recording
         e.preventDefault();
-        const toggleRec = (window as Record<string, unknown>).__soundscapeToggleRecording;
+        const toggleRec = (window as unknown as Record<string, unknown>).__soundscapeToggleRecording;
         if (typeof toggleRec === 'function') (toggleRec as () => void)();
       } else if (e.key === 'ArrowRight') {
         e.preventDefault();

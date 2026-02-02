@@ -16,6 +16,7 @@ import { audioEngine } from './AudioEngine';
 export class DemoAudio {
   private ctx: AudioContext | null = null;
   private nodes: AudioNode[] = [];
+  private transientNodes: Set<AudioNode> = new Set();
   private intervals: ReturnType<typeof setInterval>[] = [];
   private active = false;
 
@@ -57,7 +58,7 @@ export class DemoAudio {
     for (const id of this.intervals) clearInterval(id);
     this.intervals = [];
 
-    // Stop and disconnect all nodes
+    // Stop and disconnect all persistent nodes
     for (const node of this.nodes) {
       try {
         if (node instanceof OscillatorNode) node.stop();
@@ -67,6 +68,33 @@ export class DemoAudio {
       }
     }
     this.nodes = [];
+
+    // Clean up any in-flight transient nodes (kick/hi-hat bursts)
+    for (const node of this.transientNodes) {
+      try {
+        if (node instanceof OscillatorNode || node instanceof AudioBufferSourceNode) {
+          (node as OscillatorNode).stop();
+        }
+        node.disconnect();
+      } catch {
+        // Already stopped/disconnected
+      }
+    }
+    this.transientNodes.clear();
+
+    // Disconnect analyser from destination to prevent mic feedback
+    // when switching from demo mode back to microphone input.
+    // (start() connects analyser → destination for audible playback;
+    // mic mode should NOT route analyser to speakers.)
+    if (this.ctx && audioEngine.analyser) {
+      try {
+        audioEngine.analyser.disconnect(this.ctx.destination);
+      } catch {
+        // Connection didn't exist or already disconnected
+      }
+    }
+
+    this.ctx = null;
   }
 
   get isActive(): boolean {
@@ -211,6 +239,16 @@ export class DemoAudio {
         kickOsc.start(now);
         kickOsc.stop(now + 0.25);
 
+        // Track transient nodes for cleanup; auto-disconnect and remove when ended
+        this.transientNodes.add(kickOsc);
+        this.transientNodes.add(kickGain);
+        kickOsc.addEventListener('ended', () => {
+          try { kickOsc.disconnect(); } catch { /* already gone */ }
+          try { kickGain.disconnect(); } catch { /* already gone */ }
+          this.transientNodes.delete(kickOsc);
+          this.transientNodes.delete(kickGain);
+        }, { once: true });
+
         // Hi-hat — filtered noise burst (every other beat)
         if (Math.random() > 0.4) {
           const bufferSize = ctx.sampleRate * 0.05;
@@ -235,6 +273,19 @@ export class DemoAudio {
           hiFilter.connect(hiGain);
           hiGain.connect(dest);
           noise.start(now + 0.01);
+
+          // Track transient hi-hat nodes for cleanup; auto-disconnect on end
+          this.transientNodes.add(noise);
+          this.transientNodes.add(hiFilter);
+          this.transientNodes.add(hiGain);
+          noise.addEventListener('ended', () => {
+            try { noise.disconnect(); } catch { /* already gone */ }
+            try { hiFilter.disconnect(); } catch { /* already gone */ }
+            try { hiGain.disconnect(); } catch { /* already gone */ }
+            this.transientNodes.delete(noise);
+            this.transientNodes.delete(hiFilter);
+            this.transientNodes.delete(hiGain);
+          }, { once: true });
         }
       } catch {
         // Context might be closed
