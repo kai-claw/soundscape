@@ -5,7 +5,6 @@ import { useStore } from '../store/useStore';
 import { getThemeColor } from '../themes/colorThemes';
 import { audioData } from '../audio/audioData';
 
-const STAR_COUNT = 800;
 const FIELD_SIZE = 30;
 
 /** Simple seeded PRNG (mulberry32) — deterministic star layout */
@@ -21,19 +20,23 @@ function mulberry32(seed: number) {
 
 export function Starfield() {
   const pointsRef = useRef<THREE.Points>(null);
-  const visible = useStore((s) => s.starfield);
+  const userVisible = useStore((s) => s.starfield);
+  const perfEnabled = useStore((s) => s.performanceSettings.enableStarfield);
+  const starCount = useStore((s) => s.performanceSettings.starfieldCount);
+  const visible = userVisible && perfEnabled && starCount > 0;
   const theme = useStore((s) => s.theme);
   const sensitivity = useStore((s) => s.sensitivity);
 
-  // Pre-allocate all buffers
-  const { positions, basePositions, colors, sizes, phases } = useMemo(() => {
+  // Pre-allocate all buffers — sized to performance tier
+  const { positions, basePositions, colors, sizes, phases, count } = useMemo(() => {
+    const n = starCount;
     const rand = mulberry32(7777);
-    const p = new Float32Array(STAR_COUNT * 3);
-    const bp = new Float32Array(STAR_COUNT * 3);
-    const c = new Float32Array(STAR_COUNT * 3);
-    const s = new Float32Array(STAR_COUNT);
-    const ph = new Float32Array(STAR_COUNT); // twinkle phase offset
-    for (let i = 0; i < STAR_COUNT; i++) {
+    const p = new Float32Array(n * 3);
+    const bp = new Float32Array(n * 3);
+    const c = new Float32Array(n * 3);
+    const s = new Float32Array(n);
+    const ph = new Float32Array(n); // twinkle phase offset
+    for (let i = 0; i < n; i++) {
       const x = (rand() - 0.5) * FIELD_SIZE;
       const y = (rand() - 0.5) * FIELD_SIZE;
       const z = (rand() - 0.5) * FIELD_SIZE;
@@ -46,8 +49,8 @@ export function Starfield() {
       s[i] = rand() * 2.0 + 0.5;
       ph[i] = rand() * Math.PI * 2;
     }
-    return { positions: p, basePositions: bp, colors: c, sizes: s, phases: ph };
-  }, []);
+    return { positions: p, basePositions: bp, colors: c, sizes: s, phases: ph, count: n };
+  }, [starCount]);
 
   const material = useMemo(() => new THREE.ShaderMaterial({
     transparent: true,
@@ -131,7 +134,7 @@ export function Starfield() {
     const driftSpeed = 0.02 + bassEnergy * 0.15;
     const half = FIELD_SIZE / 2;
 
-    for (let i = 0; i < STAR_COUNT; i++) {
+    for (let i = 0; i < count; i++) {
       const i3 = i * 3;
       const phase = phases[i];
 

@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { audioEngine } from '../audio/AudioEngine';
+import { demoAudio } from '../audio/DemoAudio';
 import { useStore } from '../store/useStore';
 
 /** Rotating taglines — each visit feels slightly different */
@@ -61,6 +62,20 @@ export function LandingScreen({ onStart }: { onStart: () => void }) {
       setLoading(false);
     }
   }, [onStart, setAudioSource, setFileName]);
+
+  const handleDemo = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      await demoAudio.start();
+      setAudioSource('demo');
+      useStore.getState().toggleDemoMode();
+      onStart();
+    } catch {
+      setError('Could not start demo audio.');
+      setLoading(false);
+    }
+  }, [onStart, setAudioSource]);
 
   return (
     <div className="landing" role="main" aria-label="SoundScape - Audio-Reactive 3D Visualizer">
@@ -140,6 +155,19 @@ export function LandingScreen({ onStart }: { onStart: () => void }) {
             onChange={handleFile}
             style={{ display: 'none' }}
           />
+
+          <button
+            className="landing-btn demo"
+            onClick={handleDemo}
+            disabled={loading}
+            aria-label="Try with built-in generative audio demo"
+          >
+            <span className="btn-icon">🎹</span>
+            <span className="btn-text">
+              <strong>Try Demo</strong>
+              <small>No mic or file needed</small>
+            </span>
+          </button>
         </div>
 
         {loading && (

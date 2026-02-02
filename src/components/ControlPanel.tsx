@@ -1,9 +1,12 @@
 import { useRef, useCallback } from 'react';
 import { useStore, type VisualizationMode, type ColorTheme, EXPERIENCE_PRESETS } from '../store/useStore';
 import { audioEngine } from '../audio/AudioEngine';
+import { demoAudio } from '../audio/DemoAudio';
 import { themeMap } from '../themes/colorThemes';
+import { type PerformanceTier } from '../utils/gpuDetect';
 import { MiniSpectrum } from './MiniSpectrum';
 import { ShareButton } from './ShareButton';
+import { RecordButton } from './RecordButton';
 
 const modes: { id: VisualizationMode; label: string; key: string }[] = [
   { id: 'waveform', label: '🌊 Waveform', key: '1' },
@@ -56,11 +59,19 @@ export function ControlPanel() {
   const autoGainEnabled = useStore((s) => s.autoGain);
   const toggleAutoGain = useStore((s) => s.toggleAutoGain);
   const applyPreset = useStore((s) => s.applyPreset);
+  const demoMode = useStore((s) => s.demoMode);
+  const performanceTier = useStore((s) => s.performanceTier);
+  const setPerformanceTier = useStore((s) => s.setPerformanceTier);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const themeColors = themeMap[theme];
 
   const handleMicConnect = useCallback(async () => {
+    // Stop demo audio if active
+    if (demoAudio.isActive) {
+      demoAudio.stop();
+      if (demoMode) useStore.getState().toggleDemoMode();
+    }
     setAudioSource('mic');
     setFileName(null);
     try {
@@ -68,15 +79,31 @@ export function ControlPanel() {
     } catch {
       alert('Could not access microphone. Please allow mic access.');
     }
-  }, [setAudioSource, setFileName]);
+  }, [setAudioSource, setFileName, demoMode]);
 
   const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Stop demo audio if active
+    if (demoAudio.isActive) {
+      demoAudio.stop();
+      if (demoMode) useStore.getState().toggleDemoMode();
+    }
     setAudioSource('file');
     setFileName(file.name);
     audioEngine.connectFile(file);
-  }, [setAudioSource, setFileName]);
+  }, [setAudioSource, setFileName, demoMode]);
+
+  const handleDemoConnect = useCallback(async () => {
+    try {
+      await demoAudio.start();
+      setAudioSource('demo');
+      if (!demoMode) useStore.getState().toggleDemoMode();
+      setFileName(null);
+    } catch {
+      alert('Could not start demo audio.');
+    }
+  }, [setAudioSource, setFileName, demoMode]);
 
   const handleScreenshot = useCallback(() => {
     const canvas = document.querySelector('canvas');
@@ -222,6 +249,14 @@ export function ControlPanel() {
           >
             📁 File
           </button>
+          <button
+            className={audioSource === 'demo' ? 'active' : ''}
+            onClick={handleDemoConnect}
+            aria-label="Use built-in demo audio (key D)"
+            style={audioSource === 'demo' ? { background: themeColors.primary + '30', borderColor: themeColors.primary } : {}}
+          >
+            🎹 Demo
+          </button>
           <input
             ref={fileInputRef}
             type="file"
@@ -353,11 +388,33 @@ export function ControlPanel() {
         </div>
       </div>
 
+      {/* Performance & Recording */}
+      <div className="control-section">
+        <div className="perf-record-row">
+          <div className="perf-tier-control">
+            <label id="perf-label">GPU</label>
+            <select
+              aria-labelledby="perf-label"
+              value={performanceTier}
+              onChange={(e) => setPerformanceTier(e.target.value as PerformanceTier)}
+              className="perf-select"
+              style={{ borderColor: themeColors.primary + '40' }}
+            >
+              <option value="high">🚀 High</option>
+              <option value="medium">⚡ Medium</option>
+              <option value="low">🔋 Low</option>
+            </select>
+          </div>
+          <RecordButton />
+        </div>
+      </div>
+
       <div className="shortcuts-hint" aria-hidden="true">
         <span>1-7: Modes</span>
         <span>T: Theme</span>
         <span>C: Cinema</span>
-        <span>W: Wave</span>
+        <span>D: Demo</span>
+        <span>R: Record</span>
         <span>P: Panel</span>
         <span>H: Help</span>
       </div>

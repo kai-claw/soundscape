@@ -17,7 +17,6 @@ import { audioData } from '../audio/audioData';
  * the overall scale pulse and high frequencies creating fine detail spikes.
  */
 
-const RING_POINTS = 256;
 const BASE_RADIUS = 3.5;
 const MAX_SPIKE = 2.0;
 const INNER_RING_SCALE = 0.6;
@@ -29,12 +28,13 @@ export function AudioOrbitRing() {
   const visible = useStore((s) => s.orbitRing);
   const theme = useStore((s) => s.theme);
   const sensitivity = useStore((s) => s.sensitivity);
+  const ringPoints = useStore((s) => s.performanceSettings.orbitRingPoints);
 
-  // Pre-allocate position buffers (ring + closing point = RING_POINTS + 1)
-  const outerPositions = useMemo(() => new Float32Array((RING_POINTS + 1) * 3), []);
-  const outerColors = useMemo(() => new Float32Array((RING_POINTS + 1) * 3), []);
-  const innerPositions = useMemo(() => new Float32Array((RING_POINTS + 1) * 3), []);
-  const innerColors = useMemo(() => new Float32Array((RING_POINTS + 1) * 3), []);
+  // Pre-allocate position buffers (ring + closing point = ringPoints + 1)
+  const outerPositions = useMemo(() => new Float32Array((ringPoints + 1) * 3), [ringPoints]);
+  const outerColors = useMemo(() => new Float32Array((ringPoints + 1) * 3), [ringPoints]);
+  const innerPositions = useMemo(() => new Float32Array((ringPoints + 1) * 3), [ringPoints]);
+  const innerColors = useMemo(() => new Float32Array((ringPoints + 1) * 3), [ringPoints]);
 
   // Pre-create Line objects (avoid JSX <line> which conflicts with SVG intrinsic)
   const outerLine = useMemo(() => new THREE.Line(), []);
@@ -123,12 +123,12 @@ export function AudioOrbitRing() {
     // Scale pulse: bass makes the ring breathe
     const scalePulse = 1.0 + smoothBass.current * 0.3;
 
-    for (let i = 0; i <= RING_POINTS; i++) {
-      const idx = i % RING_POINTS;
-      const angle = (idx / RING_POINTS) * Math.PI * 2;
+    for (let i = 0; i <= ringPoints; i++) {
+      const idx = i % ringPoints;
+      const angle = (idx / ringPoints) * Math.PI * 2;
 
       // Map ring position to frequency bin (log scale for better distribution)
-      const freqT = idx / RING_POINTS;
+      const freqT = idx / ringPoints;
       const freqIdx = Math.floor(Math.pow(freqT, 1.4) * freqData.length * 0.85);
       const val = (freqData[freqIdx] / 255) * sensitivity;
 

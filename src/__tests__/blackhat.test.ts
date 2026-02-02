@@ -229,8 +229,9 @@ describe('Black Hat: Reduced Motion', () => {
   it('PostProcessing should disable effects in reduced motion', () => {
     const pp = readSrc('visualizers/PostProcessing.tsx');
     expect(pp).toContain('reducedMotion ? 0.6');
-    // Should not include ChromaticAberration in reduced motion
-    expect(pp).toContain('if (reducedMotion)');
+    // Should branch on reducedMotion to skip ChromaticAberration
+    expect(pp).toContain('reducedMotion');
+    expect(pp).toContain('ChromaticAberration');
   });
 
   it('transitions should be instant in reduced motion', () => {

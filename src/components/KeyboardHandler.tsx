@@ -1,5 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useStore, type VisualizationMode } from '../store/useStore';
+import { demoAudio } from '../audio/DemoAudio';
+import { audioEngine } from '../audio/AudioEngine';
 
 const modeKeys: Record<string, VisualizationMode> = {
   '1': 'waveform',
@@ -25,7 +27,35 @@ export function KeyboardHandler() {
   const togglePanelCollapsed = useStore((s) => s.togglePanelCollapsed);
   const toggleShowFps = useStore((s) => s.toggleShowFps);
   const toggleAutoGain = useStore((s) => s.toggleAutoGain);
+  const toggleBpmAdaptive = useStore((s) => s.toggleBpmAdaptive);
+  const toggleDemoMode = useStore((s) => s.toggleDemoMode);
+  const setAudioSource = useStore((s) => s.setAudioSource);
+  const demoMode = useStore((s) => s.demoMode);
   const mode = useStore((s) => s.mode);
+
+  // Demo mode toggle logic
+  const handleDemoToggle = useCallback(async () => {
+    if (demoMode) {
+      // Stop demo, switch to mic
+      demoAudio.stop();
+      toggleDemoMode();
+      setAudioSource('mic');
+      try {
+        await audioEngine.connectMic();
+      } catch {
+        // Mic access denied — that's fine, just stop demo
+      }
+    } else {
+      // Start demo
+      try {
+        await demoAudio.start();
+        toggleDemoMode();
+        setAudioSource('demo');
+      } catch {
+        // Demo start failed
+      }
+    }
+  }, [demoMode, toggleDemoMode, setAudioSource]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -73,6 +103,19 @@ export function KeyboardHandler() {
         // G: toggle auto-gain
         e.preventDefault();
         toggleAutoGain();
+      } else if (e.key.toLowerCase() === 'a') {
+        // A: toggle BPM-adaptive cinematic
+        e.preventDefault();
+        toggleBpmAdaptive();
+      } else if (e.key.toLowerCase() === 'd') {
+        // D: toggle demo audio
+        e.preventDefault();
+        handleDemoToggle();
+      } else if (e.key.toLowerCase() === 'r') {
+        // R: toggle recording
+        e.preventDefault();
+        const toggleRec = (window as Record<string, unknown>).__soundscapeToggleRecording;
+        if (typeof toggleRec === 'function') (toggleRec as () => void)();
       } else if (e.key === 'ArrowRight') {
         e.preventDefault();
         const idx = modes.indexOf(mode);
@@ -86,7 +129,7 @@ export function KeyboardHandler() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [setMode, cycleTheme, togglePlay, toggleCinematic, toggleStarfield, toggleOrbitRing, toggleBeatPulse, toggleShockwave, togglePanelCollapsed, toggleShowFps, toggleAutoGain, mode]);
+  }, [setMode, cycleTheme, togglePlay, toggleCinematic, toggleStarfield, toggleOrbitRing, toggleBeatPulse, toggleShockwave, togglePanelCollapsed, toggleShowFps, toggleAutoGain, toggleBpmAdaptive, handleDemoToggle, mode]);
 
   return null;
 }

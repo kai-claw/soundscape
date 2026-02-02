@@ -30,7 +30,9 @@ A real-time audio-reactive 3D visualizer built with React, Three.js, and the Web
 
 ### Audio Engine
 - **Web Audio API** with 2048-point FFT analysis
-- **Microphone input** (real-time) or **file upload** (MP3, WAV, FLAC, OGG, etc.)
+- **3 audio sources**: Microphone (real-time), file upload (MP3/WAV/FLAC/OGG), or built-in demo synth
+- **Demo audio synthesizer** — layered ambient synth: bass drone, detuned mid pad, shimmer harmonics, rhythmic kick/hi-hat at 110 BPM
+- **Idle breathing** — when no signal detected, visualizers gently drift with organic multi-wave pseudo-audio
 - **BPM detection** via onset analysis with dynamic thresholding
 - **Auto-gain normalization** — quiet tracks feel as punchy as loud ones
 - **Smooth audio processing** — 8-band spectral analysis with asymmetric attack/release
@@ -54,7 +56,14 @@ One-click combos that showcase the best feature combinations:
 - ❄️ **Frozen** — Icy particles + arctic starfield
 - 🌿 **Jungle** — Deep forest tunnel + beat pulse
 
-### Sharing & Screenshots
+### GPU Performance Tiers
+- **Auto-detection** via WEBGL_debug_renderer_info + heuristics
+- **3 tiers**: High (full effects), Medium (reduced particles), Low (minimal rendering)
+- **Manual override** in control panel
+- Scales: particle counts, starfield, post-processing, DPR, orbit ring resolution
+
+### Sharing, Screenshots & Recording
+- **Video recording** — capture WebGL canvas + audio as WebM (VP9/VP8)
 - **URL state encoding** — share your exact configuration via URL hash
 - **Native share dialog** on mobile, clipboard fallback on desktop
 - **Screenshot capture** — download PNG snapshots of the visualization
@@ -93,7 +102,11 @@ One-click combos that showcase the best feature combinations:
 | W | Toggle shockwave |
 | P | Collapse / expand panel |
 | G | Toggle auto-gain |
+| D | Toggle demo audio |
+| R | Start / stop recording |
+| A | Toggle BPM-adaptive cinematic |
 | F | Toggle fullscreen |
+| Shift+F | Toggle FPS counter |
 | H | Show help overlay |
 
 ## 🛠️ Tech Stack
@@ -104,7 +117,7 @@ One-click combos that showcase the best feature combinations:
 - **Custom GLSL shaders** (vertex + fragment for Waveform, Particles, Flame, Starfield, Waterfall)
 - **Zustand** state management
 - **Vite** build tooling
-- **Vitest** testing (417 tests across 10 suites)
+- **Vitest** testing (474 tests across 11 suites)
 
 ### Emotional Quality (Pass 5)
 - 🎭 **Mood Text** — evocative phrases bloom during mode transitions ("dissolve into light", "the bass pulls you forward")
@@ -116,13 +129,13 @@ One-click combos that showcase the best feature combinations:
 
 | Metric | Value |
 |--------|-------|
-| Total Files | 52 (41 source + 11 test/setup) |
-| Total LOC | ~9,900 (4,965 source + 2,491 test + 596 CSS + config) |
+| Total Files | 56 (45 source + 11 test/setup) |
+| Total LOC | ~11,000 (5,952 source + 3,312 test + 1,738 CSS) |
 | TypeScript Errors | 0 |
-| Test Count | 417 (10 test suites, 6 hat passes + 4 unit) |
-| Bundle (JS) | 76KB app + 494KB R3F + 719KB Three.js |
-| Gzip (JS) | 24KB + 152KB + 187KB = ~363KB |
-| CSS | 23.5KB (5.3KB gzip) |
+| Test Count | 474 (11 test suites, 7 hat passes + 4 unit) |
+| Bundle (JS) | 89KB app + 494KB R3F + 719KB Three.js |
+| Gzip (JS) | 28KB + 152KB + 187KB = ~372KB |
+| CSS | 23.9KB (5.4KB gzip) |
 
 ## 🚀 Getting Started
 
@@ -152,8 +165,8 @@ src/
 ├── visualizers/     # 7 Three.js visualization modes + scene orchestrator
 ├── themes/          # 6 color theme definitions
 ├── store/           # Zustand state management + experience presets
-├── utils/           # URL state encoding/decoding
-├── __tests__/       # Pass-based test suites (white/black/green/yellow hat)
+├── utils/           # URL state encoding, GPU detection
+├── __tests__/       # Pass-based test suites (7 hat passes + 4 unit)
 ├── App.tsx          # Root component
 └── main.tsx         # Entry point
 ```

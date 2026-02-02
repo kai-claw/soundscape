@@ -160,9 +160,9 @@ describe('Blue Hat — Process & Structural Integrity', () => {
       const imports: string[] = [];
       while ((match = importRegex.exec(app)) !== null) {
         const name = match[1];
-        // Skip non-component imports (hooks, utilities, types)
+        // Skip non-component imports (hooks, utilities, instances, types)
         if (['useState', 'useCallback', 'useEffect', 'useRef', 'useStore', 'themeMap',
-             'audioEngine', 'AudioEngine', 'parseUrlConfig'].includes(name)) continue;
+             'audioEngine', 'AudioEngine', 'parseUrlConfig', 'demoAudio'].includes(name)) continue;
         imports.push(name);
       }
       // Every imported component should appear in the JSX (as <Component or {Component})

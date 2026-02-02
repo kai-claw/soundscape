@@ -7,6 +7,7 @@ import { audioData } from '../audio/audioData';
 import { BPMDetector } from '../audio/BPMDetector';
 import { smoothAudio } from '../audio/SmoothAudio';
 import { autoGain } from '../audio/AutoGain';
+import { idleBreathing } from '../audio/IdleBreathing';
 import { WaveformRibbon } from './WaveformRibbon';
 import { FrequencyBars } from './FrequencyBars';
 import { ParticleField } from './ParticleField';
@@ -72,21 +73,6 @@ export function VisualizerScene({ reducedMotion = false }: Props) {
     const level = audioEngine.getAverageLevel();
     const bands = audioEngine.getBandLevels();
 
-    // Auto-gain: normalize quiet/loud tracks to consistent levels
-    autoGain.setEnabled(autoGainEnabled);
-    const gain = autoGain.update(level);
-    const effectiveSensitivity = sensitivity * gain;
-
-    // Update smooth audio analysis (available to all visualizers)
-    smoothAudio.update(audioData.freq, effectiveSensitivity);
-
-    // Single set() call per frame instead of 4 — reduces GC pressure and re-renders
-    const gainedLevel = Math.min(1, level * gain);
-    const gainedBass = Math.min(1, bands.bass * gain);
-    const gainedMid = Math.min(1, bands.mid * gain);
-    const gainedHigh = Math.min(1, bands.high * gain);
-    setAudioLevels(gainedLevel, gainedBass, gainedMid, gainedHigh);
-
     // No-signal detection: flag after ~3s of silence
     const hasSignal = audioEngine.isReceivingAudio();
     if (hasSignal) {
@@ -95,18 +81,47 @@ export function VisualizerScene({ reducedMotion = false }: Props) {
         wasSignalRef.current = true;
         setNoSignal(false);
       }
+      // Stop idle breathing when real audio returns
+      if (idleBreathing.isActive) {
+        idleBreathing.stop();
+      }
     } else {
       silentFramesRef.current++;
-      if (silentFramesRef.current >= NO_SIGNAL_THRESHOLD && wasSignalRef.current) {
-        // Only show no-signal if we previously had signal (avoid false positive on startup)
-      }
       if (silentFramesRef.current === NO_SIGNAL_THRESHOLD) {
         setNoSignal(true);
+        // Start idle breathing so visualizers don't flatline
+        idleBreathing.start();
       }
     }
 
-    const bpm = bpmDetector.detect(bands.bass, performance.now());
-    if (bpm > 0) setBpm(bpm);
+    // Idle breathing: inject gentle pseudo-audio when no signal
+    if (idleBreathing.isActive && silentFramesRef.current >= NO_SIGNAL_THRESHOLD) {
+      const idle = idleBreathing.getLevels();
+      idleBreathing.getFrequencyData(audioData.freq);
+      idleBreathing.getTimeDomainData(audioData.time);
+      setAudioLevels(idle.level, idle.bass, idle.mid, idle.high);
+
+      // Still update smooth audio with idle data
+      smoothAudio.update(audioData.freq, sensitivity);
+    } else {
+      // Auto-gain: normalize quiet/loud tracks to consistent levels
+      autoGain.setEnabled(autoGainEnabled);
+      const gain = autoGain.update(level);
+      const effectiveSensitivity = sensitivity * gain;
+
+      // Update smooth audio analysis (available to all visualizers)
+      smoothAudio.update(audioData.freq, effectiveSensitivity);
+
+      // Single set() call per frame instead of 4 — reduces GC pressure and re-renders
+      const gainedLevel = Math.min(1, level * gain);
+      const gainedBass = Math.min(1, bands.bass * gain);
+      const gainedMid = Math.min(1, bands.mid * gain);
+      const gainedHigh = Math.min(1, bands.high * gain);
+      setAudioLevels(gainedLevel, gainedBass, gainedMid, gainedHigh);
+
+      const bpm = bpmDetector.detect(bands.bass, performance.now());
+      if (bpm > 0) setBpm(bpm);
+    }
 
     // Smooth transition (instant when reduced motion)
     if (transitionProgress < 1) {

@@ -21,11 +21,13 @@ import { Starfield } from './visualizers/Starfield';
 import { useStore } from './store/useStore';
 import { themeMap } from './themes/colorThemes';
 import { audioEngine, AudioEngine } from './audio/AudioEngine';
+import { demoAudio } from './audio/DemoAudio';
 import { parseUrlConfig } from './utils/urlState';
 
 function App() {
   const theme = useStore((s) => s.theme);
   const showFps = useStore((s) => s.showFps);
+  const perfDpr = useStore((s) => s.performanceSettings.dpr);
   const colors = themeMap[theme];
   const [started, setStarted] = useState(false);
   const [webglLost, setWebglLost] = useState(false);
@@ -101,6 +103,7 @@ function App() {
   // Cleanup audio on unmount
   useEffect(() => {
     return () => {
+      demoAudio.stop();
       audioEngine.destroy();
     };
   }, []);
@@ -177,7 +180,7 @@ function App() {
 
         <Canvas
           camera={{ position: [0, 2, 7], fov: 60 }}
-          dpr={[1, 2]}
+          dpr={perfDpr}
           style={{ position: 'absolute', inset: 0 }}
           gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }}
           aria-hidden="true"

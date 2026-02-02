@@ -5,8 +5,6 @@ import { useStore } from '../store/useStore';
 import { getThemeColor } from '../themes/colorThemes';
 import { audioData } from '../audio/audioData';
 
-const COUNT = 3000;
-
 /** Simple seeded PRNG (mulberry32) — deterministic particle layout */
 function mulberry32(seed: number) {
   let s = seed | 0;
@@ -22,14 +20,16 @@ export function ParticleField({ opacity }: { opacity: number }) {
   const pointsRef = useRef<THREE.Points>(null);
   const theme = useStore((s) => s.theme);
   const sensitivity = useStore((s) => s.sensitivity);
+  const particleCount = useStore((s) => s.performanceSettings.particleCount);
 
-  const { positions, velocities, colors, sizes } = useMemo(() => {
+  const { positions, velocities, colors, sizes, count } = useMemo(() => {
+    const n = particleCount;
     const rand = mulberry32(42);
-    const p = new Float32Array(COUNT * 3);
-    const v = new Float32Array(COUNT * 3);
-    const c = new Float32Array(COUNT * 3);
-    const s = new Float32Array(COUNT);
-    for (let i = 0; i < COUNT; i++) {
+    const p = new Float32Array(n * 3);
+    const v = new Float32Array(n * 3);
+    const c = new Float32Array(n * 3);
+    const s = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
       p[i * 3] = (rand() - 0.5) * 10;
       p[i * 3 + 1] = (rand() - 0.5) * 10;
       p[i * 3 + 2] = (rand() - 0.5) * 10;
@@ -38,8 +38,8 @@ export function ParticleField({ opacity }: { opacity: number }) {
       v[i * 3 + 2] = (rand() - 0.5) * 0.02;
       s[i] = rand() * 3 + 1;
     }
-    return { positions: p, velocities: v, colors: c, sizes: s };
-  }, []);
+    return { positions: p, velocities: v, colors: c, sizes: s, count: n };
+  }, [particleCount]);
 
   // useMemo for stable material — avoids ESLint ref-during-render warning
   // while keeping the same "create once" semantics
@@ -110,7 +110,7 @@ export function ParticleField({ opacity }: { opacity: number }) {
     for (let i = 0; i < freqData.length; i++) energy += freqData[i];
     energy = (energy / freqData.length / 255) * sensitivity;
 
-    for (let i = 0; i < COUNT; i++) {
+    for (let i = 0; i < count; i++) {
       const i3 = i * 3;
       const freqIdx = i % freqData.length;
       const freq = (freqData[freqIdx] / 255) * sensitivity;

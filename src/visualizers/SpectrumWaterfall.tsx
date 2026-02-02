@@ -14,7 +14,6 @@ import { audioData } from '../audio/audioData';
  */
 
 const FREQ_BINS = 64;   // frequency resolution per row
-const HISTORY = 80;      // rows of history
 const TERRAIN_WIDTH = 10;
 const TERRAIN_DEPTH = 12;
 const MAX_HEIGHT = 4.0;
@@ -23,24 +22,31 @@ export function SpectrumWaterfall({ opacity }: { opacity: number }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const theme = useStore((s) => s.theme);
   const sensitivity = useStore((s) => s.sensitivity);
+  const historyDepth = useStore((s) => s.performanceSettings.waterfallHistory);
 
   // Row write index (ring buffer)
   const writeIdx = useRef(0);
   // Pre-allocated history buffer: each row has FREQ_BINS height values
-  const historyBuf = useRef(new Float32Array(HISTORY * FREQ_BINS));
+  const historyBuf = useRef(new Float32Array(historyDepth * FREQ_BINS));
 
-  // Geometry: FREQ_BINS × HISTORY grid
+  // Reset history buffer when depth changes
+  useEffect(() => {
+    historyBuf.current = new Float32Array(historyDepth * FREQ_BINS);
+    writeIdx.current = 0;
+  }, [historyDepth]);
+
+  // Geometry: FREQ_BINS × historyDepth grid
   const geometry = useMemo(() => {
     const geo = new THREE.PlaneGeometry(
       TERRAIN_WIDTH,
       TERRAIN_DEPTH,
       FREQ_BINS - 1,
-      HISTORY - 1,
+      historyDepth - 1,
     );
     // Rotate to lay flat on XZ plane
     geo.rotateX(-Math.PI / 2);
     return geo;
-  }, []);
+  }, [historyDepth]);
 
   // Custom shader for terrain coloring
   const material = useMemo(
@@ -121,6 +127,7 @@ export function SpectrumWaterfall({ opacity }: { opacity: number }) {
     frameCount.current++;
 
     // Push a new row of frequency data every 2 frames
+    const hDepth = historyDepth;
     if (frameCount.current % 2 === 0) {
       const row = writeIdx.current;
       for (let x = 0; x < FREQ_BINS; x++) {
@@ -131,15 +138,15 @@ export function SpectrumWaterfall({ opacity }: { opacity: number }) {
         const val = (freqData[freqIdx] / 255) * sensitivity;
         hist[row * FREQ_BINS + x] = val * MAX_HEIGHT;
       }
-      writeIdx.current = (row + 1) % HISTORY;
+      writeIdx.current = (row + 1) % hDepth;
     }
 
     // Update geometry vertices from ring buffer
     // The ring buffer write pointer points to the OLDEST row (about to be overwritten)
-    // We want row 0 of the grid = oldest, row HISTORY-1 = newest
+    // We want row 0 of the grid = oldest, row hDepth-1 = newest
     const startRow = writeIdx.current; // oldest
-    for (let z = 0; z < HISTORY; z++) {
-      const histRow = (startRow + z) % HISTORY;
+    for (let z = 0; z < hDepth; z++) {
+      const histRow = (startRow + z) % hDepth;
       for (let x = 0; x < FREQ_BINS; x++) {
         const vertIdx = z * FREQ_BINS + x;
         const h = hist[histRow * FREQ_BINS + x];

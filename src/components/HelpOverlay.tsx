@@ -11,6 +11,7 @@ const shortcuts: { key: string; action: string }[] = [
   { key: 'P', action: 'Toggle panel collapse' },
   { key: 'Space', action: 'Pause / Resume audio' },
   { key: 'G', action: 'Toggle auto-gain normalization' },
+  { key: 'A', action: 'Toggle BPM-adaptive cinematic timing' },
   { key: 'F', action: 'Toggle fullscreen' },
   { key: 'Shift+F', action: 'Toggle FPS counter' },
   { key: 'H / ?', action: 'Toggle this help overlay' },

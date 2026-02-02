@@ -1,8 +1,9 @@
 import { create } from 'zustand';
+import { type PerformanceTier, type PerformanceSettings, PERFORMANCE_PRESETS, detectGPU } from '../utils/gpuDetect';
 
 export type VisualizationMode = 'waveform' | 'frequency' | 'particles' | 'kaleidoscope' | 'tunnel' | 'waterfall' | 'flame';
 export type ColorTheme = 'neon' | 'sunset' | 'ocean' | 'monochrome' | 'arctic' | 'forest';
-export type AudioSource = 'mic' | 'file';
+export type AudioSource = 'mic' | 'file' | 'demo';
 
 /** Curated experience presets — one-click combos that showcase the best feature combinations */
 export interface ExperiencePreset {
@@ -169,6 +170,14 @@ interface AppState {
   showFps: boolean;
   /** Auto-gain normalization enabled */
   autoGain: boolean;
+  /** Performance tier — detected or manually set */
+  performanceTier: PerformanceTier;
+  /** Resolved performance settings for current tier */
+  performanceSettings: PerformanceSettings;
+  /** Demo audio mode active */
+  demoMode: boolean;
+  /** BPM-adaptive cinematic mode (timing follows detected BPM) */
+  bpmAdaptiveCinematic: boolean;
 
   setMode: (mode: VisualizationMode) => void;
   cycleTheme: () => void;
@@ -196,9 +205,18 @@ interface AppState {
   toggleAutoGain: () => void;
   /** Apply a curated experience preset */
   applyPreset: (preset: ExperiencePreset) => void;
+  /** Set performance tier (auto or manual) */
+  setPerformanceTier: (tier: PerformanceTier) => void;
+  /** Toggle demo audio mode */
+  toggleDemoMode: () => void;
+  /** Toggle BPM-adaptive cinematic timing */
+  toggleBpmAdaptive: () => void;
 }
 
 const themes: ColorTheme[] = ['neon', 'sunset', 'ocean', 'monochrome', 'arctic', 'forest'];
+
+/** Detect GPU tier on module load (runs once) */
+const detectedGPU = detectGPU();
 
 export const useStore = create<AppState>((set, get) => ({
   mode: 'waveform',
@@ -224,6 +242,10 @@ export const useStore = create<AppState>((set, get) => ({
   activePreset: null,
   showFps: false,
   autoGain: true,
+  performanceTier: detectedGPU.tier,
+  performanceSettings: PERFORMANCE_PRESETS[detectedGPU.tier],
+  demoMode: false,
+  bpmAdaptiveCinematic: true,
 
   setMode: (mode) => {
     const current = get().mode;
@@ -272,4 +294,10 @@ export const useStore = create<AppState>((set, get) => ({
       activePreset: preset.id,
     });
   },
+  setPerformanceTier: (tier) => set({
+    performanceTier: tier,
+    performanceSettings: PERFORMANCE_PRESETS[tier],
+  }),
+  toggleDemoMode: () => set((s) => ({ demoMode: !s.demoMode, activePreset: null })),
+  toggleBpmAdaptive: () => set((s) => ({ bpmAdaptiveCinematic: !s.bpmAdaptiveCinematic })),
 }));

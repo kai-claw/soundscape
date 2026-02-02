@@ -448,3 +448,71 @@ Focus: Final metrics, documentation, deploy
 ## Readiness (Pass 6)
 
 **Current State:** SoundScape is a mature, well-documented, emotionally resonant audio visualizer with 7 modes, 6 themes, 5 stackable experience layers, 8 presets, and a comprehensive test suite (417 tests, 10 suites, 0 TS errors). The codebase is architecturally clean, performance-conscious, and accessible. Passes 7–10 are charted to add creative features, re-audit for new issues, polish strengths, and deliver a final build. Deployed to kai-claw.github.io/soundscape.
+
+---
+
+# SoundScape — Green Hat #2 Audit (Pass 7)
+
+**Date:** 2026-02-02
+**Focus:** Creative Features — Idle breathing, generative demo audio, GPU performance tiers, BPM-adaptive cinematic, video recording
+
+## What Changed (Pass 7)
+
+### New Modules (+4 source files)
+| Module | LOC | Purpose |
+|--------|-----|---------|
+| IdleBreathing.ts | 106 | Multi-wave organic pseudo-audio when no signal detected. Generates gentle bass/mid/high levels + fake FFT/waveform data so visualizers drift instead of flatline. |
+| DemoAudio.ts | 253 | Built-in generative synth: bass drone (LFO sine), detuned triangle mid pad (filter sweep), shimmer harmonics (amplitude LFO), rhythmic kick/hi-hat pulse at 110 BPM. Connects through AudioEngine analyser for visualization. |
+| RecordButton.tsx | 195 | Canvas video recording via captureStream() + MediaRecorder. Tries VP9 → VP8 codec chain. Captures audio from AudioContext when available. Timestamped WebM download. Duration timer with pulsing red indicator. |
+| gpuDetect.ts | 201 | GPU performance detection via WEBGL_debug_renderer_info + regex patterns for known low/medium GPUs + maxTextureSize heuristic + mobile UA detection. Three tiers with full PerformanceSettings presets. |
+
+### Modified Systems
+| System | Changes |
+|--------|---------|
+| Store (useStore.ts) | +demoMode, +bpmAdaptiveCinematic, +performanceTier, +performanceSettings, +toggleDemoMode, +toggleBpmAdaptive, +setPerformanceTier. AudioSource union: 'mic' \| 'file' \| 'demo'. |
+| VisualizerScene.tsx | Integrated IdleBreathing: starts after 3s silence, stops when real audio returns. Injects idle levels into both store and audioData for visualizer consumption. |
+| CinematicBadge.tsx | BPM-adaptive timing via computeInterval(). Recursive setTimeout (not setInterval) for live BPM adaptation. 16 beats per mode switch. Min 6s / max 20s bounds. Progress bar + BPM sync indicator. |
+| ControlPanel.tsx | +Demo audio button (🎹), +GPU tier selector (dropdown: High/Medium/Low), +RecordButton integration. |
+| KeyboardHandler.tsx | +D: toggle demo audio, +R: toggle recording, +A: toggle BPM-adaptive cinematic. |
+| App.tsx | +Performance DPR from store, +demoAudio cleanup on unmount, +Canvas preserveDrawingBuffer for screenshots/recording. |
+| PostProcessing.tsx | Reads performanceSettings — skips entirely on low tier, disables chromatic on medium. |
+| Starfield.tsx | Reads performanceSettings — starfieldCount, perfEnabled. Hidden when tier says no starfield. |
+| LandingScreen.tsx | +Demo audio entry point on landing. |
+| HelpOverlay.tsx | +Documentation for D, R, A, G shortcuts. |
+| styles.css | +Recording indicator styles, +GPU selector styles, +Demo button styles (+1,142 LOC total CSS growth since pass 6). |
+
+### Feature Summary
+| Feature | Description | Key |
+|---------|-------------|-----|
+| Idle Breathing | Visualizers gently drift when no audio signal | Auto |
+| Demo Audio | Built-in ambient synth at 110 BPM | D |
+| GPU Performance Tiers | Auto-detect + manual override (High/Medium/Low) | UI |
+| BPM-Adaptive Cinematic | Mode cycling follows detected BPM (16 beats/switch) | A |
+| Video Recording | Capture WebGL canvas + audio as WebM | R |
+
+## Metrics After Pass 7
+
+| Metric | Pass 6 | Pass 7 | Change |
+|--------|--------|--------|--------|
+| Source Files (non-test) | 41 | 45 | +4 |
+| Source LOC (non-test) | 4,965 | 5,952 | +987 |
+| Test Files | 10 | 11 | +1 |
+| Test LOC | 2,491 | 3,312 | +821 |
+| Total Tests | 417 | 474 | +57 |
+| Test Suites | 10 | 11 | +1 |
+| Visualization Modes | 7 | 7 | — |
+| Color Themes | 6 | 6 | — |
+| Experience Layers | 5 | 5 | — |
+| Presets | 8 | 8 | — |
+| Keyboard Shortcuts | 16 | 19 | +3 (D, R, A) |
+| Audio Sources | 2 | 3 | +1 (demo) |
+| Performance Tiers | 0 | 3 | +3 |
+| TS Errors | 0 | 0 | ✅ |
+| Build Status | ✅ | ✅ | ✅ |
+| App JS (gzip) | ~28KB | ~28KB | — |
+| CSS | 596 LOC | 1,738 LOC | +1,142 |
+| Bundle (total gzip) | ~363KB | ~372KB | +9KB (+2.5%) |
+
+## Readiness (Pass 7)
+
+**Current State:** SoundScape now handles the full audio lifecycle — from no-signal (idle breathing) through demo mode (generative synth) to live audio (mic/file). GPU performance detection ensures smooth experience across device tiers. BPM-adaptive cinematic syncs mode transitions to the music's rhythm. Video recording captures the experience as shareable WebM files. 474 tests across 11 suites, 0 TS errors. 19 keyboard shortcuts. 3 audio sources. Passes 8-10 remain: re-audit (Black Hat #2), polish (Yellow Hat #2), and final audit (White Hat #2). Deployed to kai-claw.github.io/soundscape.
