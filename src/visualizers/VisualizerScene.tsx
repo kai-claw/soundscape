@@ -123,10 +123,16 @@ export function VisualizerScene({ reducedMotion = false }: Props) {
       if (bpm > 0) setBpm(bpm);
     }
 
-    // Smooth transition (instant when reduced motion)
+    // Smooth transition with ease-out curve (instant when reduced motion)
     if (transitionProgress < 1) {
-      const step = reducedMotion ? 1 : 0.03;
-      setTransitionProgress(Math.min(1, transitionProgress + step));
+      if (reducedMotion) {
+        setTransitionProgress(1);
+      } else {
+        // Ease-out: faster at start, decelerates. Feels snappier.
+        const remaining = 1 - transitionProgress;
+        const step = Math.max(0.015, remaining * 0.08);
+        setTransitionProgress(Math.min(1, transitionProgress + step));
+      }
     }
   });
 

@@ -236,7 +236,8 @@ describe('Black Hat: Reduced Motion', () => {
 
   it('transitions should be instant in reduced motion', () => {
     const scene = readSrc('visualizers/VisualizerScene.tsx');
-    expect(scene).toContain('reducedMotion ? 1 : 0.03');
+    expect(scene).toContain('setTransitionProgress(1)');
+    expect(scene).toContain('reducedMotion');
   });
 
   it('CSS should have reduced-motion styles', () => {

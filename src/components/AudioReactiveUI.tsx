@@ -21,9 +21,9 @@ export function AudioReactiveUI() {
   const smoothHighRef = useRef(0);
 
   useEffect(() => {
-    // Smooth the values to avoid jitter
-    const attack = 0.3;
-    const release = 0.05;
+    // Smooth the values — fast attack, gentle release for punchy feel
+    const attack = 0.45;
+    const release = 0.08;
 
     smoothBassRef.current += (bassLevel - smoothBassRef.current) * (bassLevel > smoothBassRef.current ? attack : release);
     smoothLevelRef.current += (audioLevel - smoothLevelRef.current) * (audioLevel > smoothLevelRef.current ? attack : release);
