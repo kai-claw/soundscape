@@ -1,13 +1,26 @@
 {
   "name": "soundscape",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "Audio-reactive 3D visualizer — waveform ribbons, frequency bars, particle fields, kaleidoscope, and bass-reactive tunnel. Built with React, Three.js, and Web Audio API.",
+  "author": "Kai & Christian",
+  "license": "MIT",
+  "homepage": "https://kai-claw.github.io/soundscape/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kai-claw/soundscape.git"
+  },
+  "keywords": ["audio", "visualizer", "3d", "threejs", "react", "webgl", "web-audio-api", "bpm-detection"],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "preview": "vite preview",
+    "deploy": "npm run build && npx gh-pages -d dist"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
@@ -21,16 +34,21 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "jsdom": "^28.0.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
-    "vite": "^7.2.4"
+    "vite": "^7.2.4",
+    "vitest": "^4.0.18"
   }
 }
