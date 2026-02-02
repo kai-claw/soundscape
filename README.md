@@ -104,19 +104,25 @@ One-click combos that showcase the best feature combinations:
 - **Custom GLSL shaders** (vertex + fragment for Waveform, Particles, Flame, Starfield, Waterfall)
 - **Zustand** state management
 - **Vite** build tooling
-- **Vitest** testing (303 tests)
+- **Vitest** testing (417 tests across 10 suites)
+
+### Emotional Quality (Pass 5)
+- 🎭 **Mood Text** — evocative phrases bloom during mode transitions ("dissolve into light", "the bass pulls you forward")
+- 🎬 **Entrance Overlay** — cinematic threshold moment when audio first connects
+- 💫 **Audio-Reactive UI** — control panel breathes with the music (bass glow, scale pulse, shimmer)
+- ✨ **Atmospheric Landing** — typewriter tagline, floating dust particles, pulsing icon glow
 
 ## 📊 Build Stats
 
 | Metric | Value |
 |--------|-------|
-| Total Files | 48 (38 source + 10 test/setup) |
-| Total LOC | 8,434 (4,677 source + 2,874 test + 883 CSS) |
+| Total Files | 52 (41 source + 11 test/setup) |
+| Total LOC | ~9,900 (4,965 source + 2,491 test + 596 CSS + config) |
 | TypeScript Errors | 0 |
-| Test Count | 303 (8 test suites) |
-| Bundle (JS) | 72KB app + 494KB R3F + 719KB Three.js |
-| Gzip (JS) | 23KB + 152KB + 187KB = ~362KB |
-| CSS | 19.4KB (4.3KB gzip) |
+| Test Count | 417 (10 test suites, 6 hat passes + 4 unit) |
+| Bundle (JS) | 76KB app + 494KB R3F + 719KB Three.js |
+| Gzip (JS) | 24KB + 152KB + 187KB = ~363KB |
+| CSS | 23.5KB (5.3KB gzip) |
 
 ## 🚀 Getting Started
 

@@ -54,8 +54,6 @@ const moodPhrases: Record<VisualizationMode, string[]> = {
 
 export function MoodText() {
   const mode = useStore((s) => s.mode);
-  const prevMode = useStore((s) => s.prevMode);
-  const transitionProgress = useStore((s) => s.transitionProgress);
   const theme = useStore((s) => s.theme);
   const panelCollapsed = useStore((s) => s.panelCollapsed);
   const colors = themeMap[theme];
