@@ -9,6 +9,7 @@ import { FrequencyBars } from './FrequencyBars';
 import { ParticleField } from './ParticleField';
 import { Kaleidoscope } from './Kaleidoscope';
 import { Tunnel } from './Tunnel';
+import { PostProcessing } from './PostProcessing';
 
 const bpmDetector = new BPMDetector();
 
@@ -93,6 +94,8 @@ export function VisualizerScene() {
       {(mode === 'tunnel' || prevModeRef.current === 'tunnel') && (
         <Tunnel freqData={freqRef.current} opacity={getOpacity('tunnel')} />
       )}
+
+      <PostProcessing />
     </>
   );
 }
