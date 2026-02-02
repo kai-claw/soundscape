@@ -15,7 +15,7 @@ html, body, #root {
   width: 100vw;
   height: 100vh;
   position: relative;
-  transition: background 0.5s ease;
+  transition: background 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ===== Landing Screen ===== */
@@ -683,20 +683,34 @@ input[type='range']::-webkit-slider-thumb {
 @media (prefers-reduced-motion: reduce) {
   .landing-ring,
   .landing-icon,
+  .landing-icon-inner,
   .landing-title,
   .landing-content,
   .control-panel,
   .audio-transport,
-  .bpm {
+  .bpm,
+  .dust-particle,
+  .landing-gradient,
+  .typewriter-cursor,
+  .loading-bar,
+  .entrance-ring,
+  .mood-text {
     animation: none !important;
   }
 
-  .beat-flash {
+  .beat-flash,
+  .entrance-overlay,
+  .mood-text {
     display: none !important;
   }
 
   .app {
     transition: none;
+  }
+
+  .control-panel {
+    transform: none !important;
+    box-shadow: none !important;
   }
 }
 
@@ -1415,6 +1429,265 @@ input[type='range']:focus-visible {
 /* ===== Share Button ===== */
 .share-btn {
   position: relative;
+}
+
+/* ===== Mood Text ===== */
+.mood-text {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  font-size: 1.1rem;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: lowercase;
+  font-style: italic;
+  opacity: 0;
+  transition: opacity 0.8s ease, bottom 0.3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.mood-text.mood-visible {
+  opacity: 0.6;
+  animation: moodFadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes moodFadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+    filter: blur(4px);
+  }
+  40% {
+    opacity: 0.6;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0.6;
+    transform: translateX(-50%) translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* ===== Entrance Overlay ===== */
+.entrance-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.entrance-waiting {
+  opacity: 0.7;
+}
+
+.entrance-listening {
+  opacity: 1;
+}
+
+.entrance-dissolving {
+  opacity: 0;
+}
+
+.entrance-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.entrance-pulse {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.entrance-ring {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border: 1px solid var(--entrance-color, #ff00ff);
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: entranceRingPulse 2s ease-in-out infinite;
+}
+
+.entrance-ring-2 {
+  width: 120px;
+  height: 120px;
+  animation-delay: 0.5s;
+  opacity: 0.2;
+}
+
+@keyframes entranceRingPulse {
+  0%, 100% { transform: scale(0.8); opacity: 0.4; }
+  50% { transform: scale(1.3); opacity: 0.1; }
+}
+
+.entrance-text {
+  font-size: 0.85rem;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: lowercase;
+}
+
+.entrance-found {
+  animation: entranceFound 0.5s ease-out;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@keyframes entranceFound {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ===== Landing Atmosphere Enhancements ===== */
+.landing-dust {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.dust-particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(180, 0, 255, 0.3);
+  border-radius: 50%;
+  animation: dustFloat 6s ease-in-out infinite;
+}
+
+@keyframes dustFloat {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.4; }
+  50% {
+    transform: translateY(-40px) translateX(20px);
+    opacity: 0.6;
+  }
+}
+
+.landing-gradient {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 30% 50%,
+    rgba(100, 0, 180, 0.08) 0%,
+    transparent 60%
+  ),
+  radial-gradient(
+    ellipse at 70% 60%,
+    rgba(0, 100, 200, 0.06) 0%,
+    transparent 50%
+  );
+  animation: gradientDrift 10s ease-in-out infinite alternate;
+}
+
+@keyframes gradientDrift {
+  0% { opacity: 0.8; filter: hue-rotate(0deg); }
+  100% { opacity: 1; filter: hue-rotate(15deg); }
+}
+
+.landing-icon-inner {
+  display: inline-block;
+  animation: float 3s ease-in-out infinite, iconGlow 4s ease-in-out infinite;
+}
+
+@keyframes iconGlow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(180, 0, 255, 0.3)); }
+  50% { filter: drop-shadow(0 0 20px rgba(180, 0, 255, 0.6)); }
+}
+
+.landing-typewriter {
+  min-height: 1.5em;
+}
+
+.typewriter-cursor {
+  display: inline-block;
+  margin-left: 1px;
+  animation: cursorBlink 1s step-end infinite;
+  color: rgba(180, 0, 255, 0.6);
+  font-weight: 300;
+}
+
+@keyframes cursorBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.landing-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+}
+
+.loading-wave {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  height: 20px;
+}
+
+.loading-bar {
+  width: 3px;
+  height: 8px;
+  background: rgba(180, 0, 255, 0.5);
+  border-radius: 2px;
+  animation: loadingWave 0.8s ease-in-out infinite;
+}
+
+@keyframes loadingWave {
+  0%, 100% { height: 8px; }
+  50% { height: 18px; }
+}
+
+.landing-hint {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.2);
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  margin-top: 8px;
+}
+
+/* ===== Audio-Reactive UI Variables ===== */
+:root {
+  --audio-glow: 0;
+  --audio-bg-alpha: 0.85;
+  --audio-border-alpha: 0.1;
+  --audio-scale: 1;
+  --audio-sparkle: 0;
+  --theme-primary: #ff00ff;
+  --theme-secondary: #00ffff;
+  --theme-accent: #ffff00;
+}
+
+/* Apply audio-reactive styling to control panel */
+.control-panel {
+  box-shadow:
+    0 0 calc(var(--audio-glow) * 40px) rgba(var(--audio-glow), var(--audio-glow), var(--audio-glow), 0.1),
+    inset 0 0 calc(var(--audio-glow) * 20px) rgba(255, 255, 255, calc(var(--audio-glow) * 0.03));
+  transform: scale(var(--audio-scale));
+  transform-origin: top right;
+}
+
+/* Panel header text glow with audio */
+.panel-header h2 {
+  text-shadow: 0 0 calc(var(--audio-sparkle) * 15px) var(--theme-primary);
 }
 
 /* ===== Very Small Screens ===== */

@@ -1,6 +1,15 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { audioEngine } from '../audio/AudioEngine';
 import { useStore } from '../store/useStore';
+
+/** Rotating taglines — each visit feels slightly different */
+const taglines = [
+  'See what sound looks like',
+  'Where music becomes light',
+  'Audio-Reactive 3D Visualizer',
+  'Turn up. Tune in. See everything.',
+  'Your music, reimagined in 3D',
+];
 
 export function LandingScreen({ onStart }: { onStart: () => void }) {
   const [loading, setLoading] = useState(false);
@@ -8,6 +17,21 @@ export function LandingScreen({ onStart }: { onStart: () => void }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const setAudioSource = useStore((s) => s.setAudioSource);
   const setFileName = useStore((s) => s.setFileName);
+
+  // Pick a random tagline on mount
+  const [tagline] = useState(() => taglines[Math.floor(Math.random() * taglines.length)]);
+
+  // Typewriter effect for tagline
+  const [displayedTagline, setDisplayedTagline] = useState('');
+  useEffect(() => {
+    let i = 0;
+    const timer = setInterval(() => {
+      i++;
+      setDisplayedTagline(tagline.slice(0, i));
+      if (i >= tagline.length) clearInterval(timer);
+    }, 45);
+    return () => clearInterval(timer);
+  }, [tagline]);
 
   const handleMic = useCallback(async () => {
     setLoading(true);
@@ -40,6 +64,7 @@ export function LandingScreen({ onStart }: { onStart: () => void }) {
 
   return (
     <div className="landing" role="main" aria-label="SoundScape - Audio-Reactive 3D Visualizer">
+      {/* Atmospheric background — layered rings + floating dust */}
       <div className="landing-bg">
         {Array.from({ length: 40 }).map((_, i) => (
           <div
@@ -52,14 +77,34 @@ export function LandingScreen({ onStart }: { onStart: () => void }) {
           />
         ))}
       </div>
+      <div className="landing-dust" aria-hidden="true">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div
+            key={i}
+            className="dust-particle"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 6}s`,
+              animationDuration: `${4 + Math.random() * 4}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Ambient gradient wash */}
+      <div className="landing-gradient" aria-hidden="true" />
 
       <div className="landing-content">
-        <div className="landing-icon">🎵</div>
+        <div className="landing-icon" aria-hidden="true">
+          <span className="landing-icon-inner">🎵</span>
+        </div>
         <h1 className="landing-title">
           Sound<span>Scape</span>
         </h1>
-        <p className="landing-subtitle">
-          Audio-Reactive 3D Visualizer
+        <p className="landing-subtitle landing-typewriter">
+          {displayedTagline}
+          <span className="typewriter-cursor" aria-hidden="true">|</span>
         </p>
 
         <div className="landing-actions">
@@ -97,7 +142,18 @@ export function LandingScreen({ onStart }: { onStart: () => void }) {
           />
         </div>
 
-        {error && <p className="landing-error">{error}</p>}
+        {loading && (
+          <div className="landing-loading" aria-live="polite">
+            <div className="loading-wave">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="loading-bar" style={{ animationDelay: `${i * 0.1}s` }} />
+              ))}
+            </div>
+            <span>Connecting...</span>
+          </div>
+        )}
+
+        {error && <p className="landing-error" role="alert">{error}</p>}
 
         <div className="landing-features">
           <span>🌊 Waveform</span>
@@ -108,6 +164,10 @@ export function LandingScreen({ onStart }: { onStart: () => void }) {
           <span>🏔️ Waterfall</span>
           <span>🔥 Flame</span>
         </div>
+
+        <p className="landing-hint" aria-hidden="true">
+          7 modes · 6 themes · 8 presets · keyboard shortcuts
+        </p>
       </div>
     </div>
   );

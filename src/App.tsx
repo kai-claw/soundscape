@@ -14,6 +14,9 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { CinematicBadge } from './components/CinematicBadge';
 import { BpmDisplay } from './components/BpmDisplay';
 import { FpsCounter } from './components/FpsCounter';
+import { MoodText } from './components/MoodText';
+import { EntranceOverlay } from './components/EntranceOverlay';
+import { AudioReactiveUI } from './components/AudioReactiveUI';
 import { Starfield } from './visualizers/Starfield';
 import { useStore } from './store/useStore';
 import { themeMap } from './themes/colorThemes';
@@ -201,6 +204,9 @@ function App() {
           <VisualizerScene reducedMotion={prefersReducedMotion} />
         </Canvas>
         {!prefersReducedMotion && <BeatFlash />}
+        <EntranceOverlay />
+        <MoodText />
+        <AudioReactiveUI />
         <CinematicBadge />
         <BpmDisplay />
         <FpsCounter visible={showFps} />
